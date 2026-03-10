@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Tetrisweeper.iml" filepath="$PROJECT_DIR$/Tetrisweeper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/textures/textures.iml" filepath="$PROJECT_DIR$/textures/textures.iml" />
     </modules>
   </component>
 </project>

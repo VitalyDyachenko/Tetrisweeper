@@ -1,10 +1,11 @@
 import UI.FieldDrawer;
 
-//import java.lang.reflect.Field;
-//
+import minesweeper.Field;
+
 public class Main {
     public static void main(String[] args) {
+        Field field = new Field();
         FieldDrawer f = new FieldDrawer();
-        f.draw();
+        f.draw(field);
     }
 }
