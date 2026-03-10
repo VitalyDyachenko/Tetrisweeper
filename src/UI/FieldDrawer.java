@@ -2,7 +2,7 @@ package UI;
 
 import javax.swing.*;
 import java.awt.*;
-
+//
 public class FieldDrawer {
     public void draw() {
         JFrame frame = new JFrame("Моё окно");
