@@ -1,7 +1,7 @@
 package View;
 
 import Model.minesweeper.Field;
-import Model.tetris.FallingTetromino;
+import Model.tetris.FallingTetrimino;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,7 +31,7 @@ public class GameView {
         game_frame.setVisible(true);
     }
 
-    public void update(Field f, FallingTetromino tet) {
+    public void update(Field f, FallingTetrimino tet) {
         field.update(f, tet);
     }
 }

@@ -1,6 +1,6 @@
 package Model.tetris;
 
-public enum TetrominoType {
+public enum TetriminoType {
     //O,
     //I,
     //S,

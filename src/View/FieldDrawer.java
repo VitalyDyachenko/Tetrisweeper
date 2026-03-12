@@ -1,16 +1,14 @@
 package View;
 
 import Model.minesweeper.Field;
-import Model.tetris.FallingTetromino;
+import Model.tetris.FallingTetrimino;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 
 public class FieldDrawer {
-    public static final int SIZE = 34;
+    public static final int SIZE = 32;
     public static final int FRAME_X = SIZE*(Field.FIELD_X + 6);
     public static final int FRAME_Y = SIZE*(Field.FIELD_Y) + 40;
 
@@ -44,7 +42,7 @@ public class FieldDrawer {
         }
     }
 
-    public void update(Field f, FallingTetromino tet) {
+    public void update(Field f, FallingTetrimino tet) {
         for (int x = 0; x < Field.FIELD_X; x++) {
             for (int y = 0; y < Field.FIELD_Y; y++) {
                 buttons[x][y].setIcon(icon_e);

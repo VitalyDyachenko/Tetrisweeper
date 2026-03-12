@@ -1,7 +1,7 @@
 package Controller;
 
 import Model.minesweeper.Field;
-import Model.tetris.FallingTetromino;
+import Model.tetris.FallingTetrimino;
 import View.GameView;
 
 import javax.swing.Timer;
@@ -10,7 +10,7 @@ public class TetrisWeeperEngine {
     private GameView view = new GameView();
 
     private Field field = new Field();
-    private FallingTetromino tet = new FallingTetromino();
+    private FallingTetrimino tet = new FallingTetrimino();
 
     private Timer gameTimer;
 

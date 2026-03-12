@@ -2,12 +2,12 @@ package Model.tetris;
 
 import java.awt.*;
 
-public class FallingTetromino {
-    TetrominoType type = TetrominoType.T;
+public class FallingTetrimino {
+    TetriminoType type = TetriminoType.T;
     Rotation rotation = Rotation.NORTH;
     Point pos = new Point(0, 0);
 
-    public FallingTetromino() {
+    public FallingTetrimino() {
         // type =
     }
 
