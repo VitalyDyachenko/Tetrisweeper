@@ -1,6 +1,7 @@
 package View;
 
-import minesweeper.Field;
+import Model.minesweeper.Field;
+import Model.tetris.FallingTetromino;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,13 +17,21 @@ public class GameView {
         game_frame.setResizable(false);
 
         game_panel.setBackground(Color.BLACK);
-        game_panel.setPreferredSize(new Dimension(Field.FIELD_X * FieldDrawer.SIZE, Field.FIELD_Y * FieldDrawer.SIZE));
+        game_panel.setPreferredSize(new Dimension(
+                Field.FIELD_X * FieldDrawer.SIZE,
+                Field.FIELD_Y * FieldDrawer.SIZE
+        ));
 
         main_panel.add(game_panel, BorderLayout.WEST);
+        main_panel.setBackground(Color.GRAY);
 
         game_frame.add(main_panel);
         game_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        game_frame.setLocation(500, 50);
         game_frame.setVisible(true);
     }
 
+    public void update(Field f, FallingTetromino tet) {
+        field.update(f, tet);
+    }
 }

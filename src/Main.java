@@ -1,11 +1,10 @@
-import View.FieldDrawer;
-
+import Controller.TetrisWeeperEngine;
 import View.GameView;
-import minesweeper.Field;
+import Model.minesweeper.Field;
 
 public class Main {
     public static void main(String[] args) {
-        Field field = new Field();
-        GameView v = new GameView();
+        TetrisWeeperEngine game = new TetrisWeeperEngine();
+        game.run();
     }
 }
