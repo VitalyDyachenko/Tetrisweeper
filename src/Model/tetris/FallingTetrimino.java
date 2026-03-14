@@ -55,6 +55,7 @@ public class FallingTetrimino {
         for (int i = 0; i < TETROMINO_SIZE; i++) {
             field.setCell(pos.x + cells_pos[i].x, pos.y + cells_pos[i].y, cells[i]);
         }
+        field.removeLines();
     }
     public boolean moveLeft(Field field) {
         pos.x--;
