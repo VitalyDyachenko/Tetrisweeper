@@ -1,8 +1,10 @@
 package Model.tetris;
 
 import Controller.Context;
+import Controller.GameState;
 import Model.minesweeper.Cell;
 import Model.minesweeper.Field;
+import View.FieldDrawer;
 
 import java.awt.*;
 import java.util.Random;
@@ -12,7 +14,7 @@ public class FallingTetrimino {
 
     TetriminoType type;
     Rotation rotation = Rotation.NORTH;
-    Point pos = new Point(0, 0);
+    Point pos = new Point(Field.FIELD_X/2 - 1, -1);
     Cell[] cells = new Cell[TETROMINO_SIZE];
     Point[] cells_pos = new Point[TETROMINO_SIZE];
 
@@ -31,6 +33,7 @@ public class FallingTetrimino {
     public boolean haveCollisions(Field field) {
         Point[] points = getCellsPos();
         for (Point p : points) {
+            if (pos.y + p.y < 0) return true;
             if (
                     pos.y + p.y >= Field.FIELD_Y ||
                     pos.x + p.x >= Field.FIELD_X ||
@@ -60,6 +63,10 @@ public class FallingTetrimino {
     }
     private void setInField(Context context) {
         for (int i = 0; i < TETROMINO_SIZE; i++) {
+            if (pos.y + cells_pos[i].y < 0) {
+                context.state = GameState.LOOSE;
+                return;
+            }
             context.field.setCell(pos.x + cells_pos[i].x, pos.y + cells_pos[i].y, cells[i]);
         }
         context.field.removeLines(context);

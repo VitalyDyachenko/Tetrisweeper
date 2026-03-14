@@ -19,32 +19,42 @@ public class TetrisWeeperEngine {
         view.setInputHandler(new GameView.InputHandler() {
             @Override
             public void onLeft() {
-                context.tet.moveLeft(context.field);
-                view.update(context);
+                if (context.state == GameState.RUN) {
+                    context.tet.moveLeft(context.field);
+                    view.update(context);
+                }
             }
 
             @Override
             public void onRight() {
-                context.tet.moveRight(context.field);
-                view.update(context);
+                if (context.state == GameState.RUN) {
+                    context.tet.moveRight(context.field);
+                    view.update(context);
+                }
             }
 
             @Override
             public void onDown() {
-                if (!context.tet.moveDown(context, MoveCause.SOFT_DROP)) context.tet = new FallingTetrimino(RANDOM);
-                view.update(context);
+                if (context.state == GameState.RUN) {
+                    if (!context.tet.moveDown(context, MoveCause.SOFT_DROP)) context.tet = new FallingTetrimino(RANDOM);
+                    view.update(context);
+                }
             }
 
             @Override
             public void onRotateLeft() {
-                context.tet.rotateLeft(context.field);
-                view.update(context);
+                if (context.state == GameState.RUN) {
+                    context.tet.rotateLeft(context.field);
+                    view.update(context);
+                }
             }
 
             @Override
             public void onRotateRight() {
-                context.tet.rotateRight(context.field);
-                view.update(context);
+                if (context.state == GameState.RUN) {
+                    context.tet.rotateRight(context.field);
+                    view.update(context);
+                }
             }
 
 
@@ -70,23 +80,40 @@ public class TetrisWeeperEngine {
                 view.update(context);
                 game_timer.stop();
             }
-
             @Override
-            public void onCellLeftClick(int x, int y) {
-                System.out.println("Левая кнопка " + x + " " + y + " нажата");
+            public void onPause() {
+                if (context.state == GameState.PAUSE) {
+                    context.state = GameState.RUN;
+                    game_timer.start();
+                }
+                else if (context.state == GameState.RUN) {
+                    context.state = GameState.PAUSE;
+                    game_timer.stop();
+                }
                 view.update(context);
             }
 
             @Override
+            public void onCellLeftClick(int x, int y) {
+                if (context.state == GameState.RUN) {
+                    System.out.println("Левая кнопка " + x + " " + y + " нажата");
+                    view.update(context);
+                }
+            }
+
+            @Override
             public void onCellRightClick(int x, int y) {
-                System.out.println("Правая кнопка " + x + " " + y + " нажата");
-                view.update(context);
+                if (context.state == GameState.RUN) {
+                    System.out.println("Правая кнопка " + x + " " + y + " нажата");
+                    view.update(context);
+                }
             }
         });
 
         game_timer = new Timer(1000, e -> {
             if (!context.tet.moveDown(context, MoveCause.GRAVITY)) context.tet = new FallingTetrimino(RANDOM);
             view.update(context);
+            if (context.state == GameState.LOOSE) game_timer.stop();
         });
     }
 }

@@ -14,7 +14,7 @@ import java.awt.event.MouseEvent;
 public class FieldDrawer {
     public static final int SIZE = 32;
     public static final int FRAME_X = SIZE*(Field.FIELD_X + 6);
-    public static final int FRAME_Y = SIZE*(Field.FIELD_Y) + 40;
+    public static final int FRAME_Y = SIZE*(Field.FIELD_Y) + 37;
 
     private JButton[][] buttons = new JButton[Field.FIELD_X][Field.FIELD_Y];
     private static final Border CELL_BORDER =
@@ -67,7 +67,8 @@ public class FieldDrawer {
         for (int i = 0; i < FallingTetrimino.TETROMINO_SIZE; i++) {
             Point p = tet.getCellsPos()[i];
             Cell c = tet.getCells()[i];
-            buttons[p.x + tet.getPos().x][p.y + tet.getPos().y].setIcon(getCellTexture(c));
+            if (p.y + tet.getPos().y >= 0)
+                buttons[p.x + tet.getPos().x][p.y + tet.getPos().y].setIcon(getCellTexture(c));
         }
     }
 

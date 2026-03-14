@@ -18,7 +18,10 @@ public class GameView {
     private JPanel game_info_panel = new JPanel();
     private JPanel menu_panel;
     private JLabel mode_label;
-    JLabel score_label;
+    private JLabel score_label;
+    private JLabel stop_label;
+    private JLayeredPane layered_pane;
+
 
     private JButton restart_button;
     private JButton menu_button;
@@ -37,6 +40,7 @@ public class GameView {
         void onRestart();
         void onMenu();
         void onModeChanged(GameMode mode);
+        void onPause();
 
         void onCellLeftClick(int x, int y);
         void onCellRightClick(int x, int y);
@@ -56,7 +60,7 @@ public class GameView {
         createMenuPanel();
 
         game_info_panel.setVisible(false);
-        game_panel.setVisible(false);
+        layered_pane.setVisible(false);
 
         game_frame.setVisible(true);
     }
@@ -79,8 +83,32 @@ public class GameView {
                 Field.FIELD_X * FieldDrawer.SIZE,
                 Field.FIELD_Y * FieldDrawer.SIZE
         ));
+        game_panel.setLayout(new GridLayout(Field.FIELD_Y, Field.FIELD_X));
+        game_panel.setBounds(0, 0,
+                Field.FIELD_X * FieldDrawer.SIZE,
+                Field.FIELD_Y * FieldDrawer.SIZE
+        );
 
-        main_panel.add(game_panel, BorderLayout.WEST);
+        stop_label = new JLabel("GAME OVER", SwingConstants.CENTER);
+        stop_label.setFont(new Font("Arial", Font.BOLD, 48));
+        //stop_label.setOpaque(true);
+        //stop_label.setBackground(new Color(255, 255, 255, 10));
+        stop_label.setForeground(new Color(255, 255, 255, 150));
+        stop_label.setBounds(0, 0,
+                Field.FIELD_X * FieldDrawer.SIZE,
+                Field.FIELD_Y * FieldDrawer.SIZE
+        );
+        stop_label.setVisible(false);
+
+        layered_pane = new JLayeredPane();
+        layered_pane.setPreferredSize(new Dimension(
+                Field.FIELD_X * FieldDrawer.SIZE,
+                Field.FIELD_Y * FieldDrawer.SIZE
+        ));
+        layered_pane.add(stop_label, JLayeredPane.POPUP_LAYER); // Слой выше
+        layered_pane.add(game_panel, JLayeredPane.DEFAULT_LAYER); // Слой 0
+
+        main_panel.add(layered_pane, BorderLayout.WEST);
         main_panel.setBackground(Color.GRAY);
         setupKeyBindings();
         game_frame.add(main_panel);
@@ -214,6 +242,7 @@ public class GameView {
         ActionMap action_map = main_panel.getActionMap();
 
         input_map.put(KeyStroke.getKeyStroke("LEFT"), "moveLeft");
+        input_map.put(KeyStroke.getKeyStroke("A"), "moveLeft");
         action_map.put("moveLeft", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -222,6 +251,7 @@ public class GameView {
         });
 
         input_map.put(KeyStroke.getKeyStroke("RIGHT"), "moveRight");
+        input_map.put(KeyStroke.getKeyStroke("D"), "moveRight");
         action_map.put("moveRight", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -253,20 +283,41 @@ public class GameView {
                 if (input_handler != null) input_handler.onRotateRight();
             }
         });
+
+        input_map.put(KeyStroke.getKeyStroke("ESCAPE"), "switchPause");
+        action_map.put("switchPause", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (input_handler != null) input_handler.onPause();
+            }
+        });
     }
 
     public void update(Context context) {
-        field.update(context.field, context.tet);
+        if (context.state == GameState.RUN) {
+            field.update(context.field, context.tet);
+        }
 
         if (context.state == GameState.MENU) {
             menu_panel.setVisible(true);
             game_info_panel.setVisible(false);
-            game_panel.setVisible(false);
+            layered_pane.setVisible(false);
         }
         else {
             menu_panel.setVisible(false);
             game_info_panel.setVisible(true);
-            game_panel.setVisible(true);
+            layered_pane.setVisible(true);
+            if (context.state == GameState.LOOSE) {
+                stop_label.setText("GAME OVER");
+                stop_label.setVisible(true);
+            }
+            else if (context.state == GameState.PAUSE) {
+                stop_label.setText("PAUSE");
+                stop_label.setVisible(true);
+            }
+            else {
+                stop_label.setVisible(false);
+            }
         }
 
         mode_label.setText(context.mode.toString());
