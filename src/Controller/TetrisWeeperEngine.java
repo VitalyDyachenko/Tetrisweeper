@@ -5,14 +5,16 @@ import Model.tetris.FallingTetrimino;
 import View.GameView;
 
 import javax.swing.Timer;
+import java.util.Random;
 
 public class TetrisWeeperEngine {
     private GameView view = new GameView();
 
     private Field field = new Field();
-    private FallingTetrimino tet = new FallingTetrimino();
+    private FallingTetrimino tet = new FallingTetrimino(RANDOM);
 
     private Timer gameTimer;
+    private static final Random RANDOM = new Random();
 
     public TetrisWeeperEngine() {
         view.setInputHandler(new GameView.InputHandler() {
@@ -30,7 +32,7 @@ public class TetrisWeeperEngine {
 
             @Override
             public void onDown() {
-                if (!tet.moveDown(field)) tet = new FallingTetrimino();
+                if (!tet.moveDown(field)) tet = new FallingTetrimino(RANDOM);
                 view.update(field, tet);
             }
 
@@ -65,7 +67,7 @@ public class TetrisWeeperEngine {
         view.update(field, tet);
         gameTimer = new Timer(1000, e -> {
             // Это выполняется в EDT
-            if (!tet.moveDown(field)) tet = new FallingTetrimino();
+            if (!tet.moveDown(field)) tet = new FallingTetrimino(RANDOM);
             view.update(field, tet);
         });
         gameTimer.start();

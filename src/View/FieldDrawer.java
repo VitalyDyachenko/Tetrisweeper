@@ -74,6 +74,12 @@ public class FieldDrawer {
     private ImageIcon getCellTexture(Cell cell) {
         if (cell == null) return CellTexture.EMPTY.getIcon();
         if (cell.getType() == TetriminoType.T) return CellTexture.T.getIcon();
+        if (cell.getType() == TetriminoType.O) return CellTexture.O.getIcon();
+        if (cell.getType() == TetriminoType.I) return CellTexture.I.getIcon();
+        if (cell.getType() == TetriminoType.S) return CellTexture.S.getIcon();
+        if (cell.getType() == TetriminoType.Z) return CellTexture.Z.getIcon();
+        if (cell.getType() == TetriminoType.L) return CellTexture.L.getIcon();
+        if (cell.getType() == TetriminoType.J) return CellTexture.J.getIcon();
         return CellTexture.EMPTY.getIcon();
     }
 }

@@ -4,17 +4,19 @@ import Model.minesweeper.Cell;
 import Model.minesweeper.Field;
 
 import java.awt.*;
+import java.util.Random;
 
 public class FallingTetrimino {
     public static final int TETROMINO_SIZE = 4;
 
-    TetriminoType type = TetriminoType.T;
+    TetriminoType type;
     Rotation rotation = Rotation.NORTH;
     Point pos = new Point(0, 0);
     Cell[] cells = new Cell[TETROMINO_SIZE];
     Point[] cells_pos = new Point[TETROMINO_SIZE];
 
-    public FallingTetrimino() {
+    public FallingTetrimino(Random rand) {
+        type = TetriminoType.values()[rand.nextInt(TetriminoType.values().length)];
         for (int i = 0; i < TETROMINO_SIZE; i++) {
             cells[i] = new Cell(type);
         }
@@ -102,7 +104,7 @@ public class FallingTetrimino {
                             new Point(0, 1),
                             new Point(1, 0),
                             new Point(1, 1),
-                            new Point(2, 1)
+                            new Point(2, 1),
                     };
                 }
                 case Rotation.EAST -> {
@@ -110,7 +112,7 @@ public class FallingTetrimino {
                             new Point(1, 0),
                             new Point(2, 1),
                             new Point(1, 1),
-                            new Point(1, 2)
+                            new Point(1, 2),
                     };
                 }
                 case Rotation.SOUTH -> {
@@ -118,7 +120,7 @@ public class FallingTetrimino {
                             new Point(2, 1),
                             new Point(1, 2),
                             new Point(1, 1),
-                            new Point(0, 1)
+                            new Point(0, 1),
                     };
                 }
                 case Rotation.WEST -> {
@@ -126,7 +128,211 @@ public class FallingTetrimino {
                             new Point(1, 2),
                             new Point(0, 1),
                             new Point(1, 1),
-                            new Point(1, 0)
+                            new Point(1, 0),
+                    };
+                }
+            };
+            case O -> switch (rotation) {
+                case Rotation.NORTH -> {
+                    yield new Point[]{
+                            new Point(0, 0),
+                            new Point(1, 0),
+                            new Point(1, 1),
+                            new Point(0, 1),
+                    };
+                }
+                case Rotation.EAST -> {
+                    yield new Point[]{
+                            new Point(1, 0),
+                            new Point(1, 1),
+                            new Point(0, 1),
+                            new Point(0, 0),
+                    };
+                }
+                case Rotation.SOUTH -> {
+                    yield new Point[]{
+                            new Point(1, 1),
+                            new Point(0, 1),
+                            new Point(0, 0),
+                            new Point(1, 0),
+                    };
+                }
+                case Rotation.WEST -> {
+                    yield new Point[]{
+                            new Point(0, 1),
+                            new Point(0, 0),
+                            new Point(1, 0),
+                            new Point(1, 1),
+                    };
+                }
+            };
+            case I -> switch (rotation) {
+                case Rotation.NORTH -> {
+                    yield new Point[]{
+                            new Point(0, 1),
+                            new Point(1, 1),
+                            new Point(2, 1),
+                            new Point(3, 1),
+                    };
+                }
+                case Rotation.EAST -> {
+                    yield new Point[]{
+                            new Point(2, 0),
+                            new Point(2, 1),
+                            new Point(2, 2),
+                            new Point(2, 3),
+                    };
+                }
+                case Rotation.SOUTH -> {
+                    yield new Point[]{
+                            new Point(3, 2),
+                            new Point(2, 2),
+                            new Point(1, 2),
+                            new Point(0, 2),
+                    };
+                }
+                case Rotation.WEST -> {
+                    yield new Point[]{
+                            new Point(1, 3),
+                            new Point(1, 2),
+                            new Point(1, 1),
+                            new Point(1, 0),
+                    };
+                }
+            };
+            case S -> switch (rotation) {
+                case Rotation.NORTH -> {
+                    yield new Point[]{
+                            new Point(0, 1),
+                            new Point(1, 1),
+                            new Point(1, 0),
+                            new Point(2, 0),
+                    };
+                }
+                case Rotation.EAST -> {
+                    yield new Point[]{
+                            new Point(1, 0),
+                            new Point(1, 1),
+                            new Point(2, 1),
+                            new Point(2, 2),
+                    };
+                }
+                case Rotation.SOUTH -> {
+                    yield new Point[]{
+                            new Point(2, 1),
+                            new Point(1, 1),
+                            new Point(1, 2),
+                            new Point(0, 2),
+                    };
+                }
+                case Rotation.WEST -> {
+                    yield new Point[]{
+                            new Point(1, 2),
+                            new Point(1, 1),
+                            new Point(0, 1),
+                            new Point(0, 0),
+                    };
+                }
+            };
+            case Z -> switch (rotation) {
+                case Rotation.NORTH -> {
+                    yield new Point[]{
+                            new Point(0, 0),
+                            new Point(1, 0),
+                            new Point(1, 1),
+                            new Point(2, 1),
+                    };
+                }
+                case Rotation.EAST -> {
+                    yield new Point[]{
+                            new Point(2, 0),
+                            new Point(2, 1),
+                            new Point(1, 1),
+                            new Point(1, 2),
+                    };
+                }
+                case Rotation.SOUTH -> {
+                    yield new Point[]{
+                            new Point(2, 2),
+                            new Point(1, 2),
+                            new Point(1, 1),
+                            new Point(0, 1),
+                    };
+                }
+                case Rotation.WEST -> {
+                    yield new Point[]{
+                            new Point(0, 2),
+                            new Point(0, 1),
+                            new Point(1, 1),
+                            new Point(1, 0),
+                    };
+                }
+            };
+            case L -> switch (rotation) {
+                case Rotation.NORTH -> {
+                    yield new Point[]{
+                            new Point(0, 1),
+                            new Point(1, 1),
+                            new Point(2, 1),
+                            new Point(2, 0),
+                    };
+                }
+                case Rotation.EAST -> {
+                    yield new Point[]{
+                            new Point(1, 0),
+                            new Point(1, 1),
+                            new Point(1, 2),
+                            new Point(2, 2),
+                    };
+                }
+                case Rotation.SOUTH -> {
+                    yield new Point[]{
+                            new Point(2, 1),
+                            new Point(1, 1),
+                            new Point(0, 1),
+                            new Point(0, 2),
+                    };
+                }
+                case Rotation.WEST -> {
+                    yield new Point[]{
+                            new Point(1, 2),
+                            new Point(1, 1),
+                            new Point(1, 0),
+                            new Point(0, 0),
+                    };
+                }
+            };
+            case J -> switch (rotation) {
+                case Rotation.NORTH -> {
+                    yield new Point[]{
+                            new Point(0, 0),
+                            new Point(0, 1),
+                            new Point(1, 1),
+                            new Point(2, 1),
+                    };
+                }
+                case Rotation.EAST -> {
+                    yield new Point[]{
+                            new Point(2, 0),
+                            new Point(1, 0),
+                            new Point(1, 1),
+                            new Point(1, 2),
+                    };
+                }
+                case Rotation.SOUTH -> {
+                    yield new Point[]{
+                            new Point(2, 2),
+                            new Point(2, 1),
+                            new Point(1, 1),
+                            new Point(0, 1),
+                    };
+                }
+                case Rotation.WEST -> {
+                    yield new Point[]{
+                            new Point(0, 2),
+                            new Point(1, 2),
+                            new Point(1, 1),
+                            new Point(1, 0),
                     };
                 }
             };
