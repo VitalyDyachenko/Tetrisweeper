@@ -18,7 +18,7 @@ public class TetrisWeeperEngine {
         view.update(field, tet);
         gameTimer = new Timer(1000, e -> {
             // Это выполняется в EDT
-            tet.move();
+            if (!tet.move(field)) tet = new FallingTetrimino();
             view.update(field, tet);
         });
         gameTimer.start();
