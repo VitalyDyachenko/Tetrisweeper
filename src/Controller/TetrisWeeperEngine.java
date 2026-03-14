@@ -36,7 +36,7 @@ public class TetrisWeeperEngine {
             @Override
             public void onDown() {
                 if (context.state == GameState.RUN) {
-                    if (!context.tet.moveDown(context, MoveCause.SOFT_DROP)) context.tet = new FallingTetrimino(RANDOM);
+                    if (!context.tet.moveDown(context, MoveCause.SOFT_DROP)) nextTetrimino();
                     view.update(context);
                 }
             }
@@ -66,9 +66,22 @@ public class TetrisWeeperEngine {
             }
 
             @Override
+            public void onStart() {
+                if (context.state != GameState.RUN) {
+                    context.field.clear();
+                    nextTetrimino();
+                    nextTetrimino();
+                    context.state = GameState.RUN;
+                    view.update(context);
+                    game_timer.start();
+                }
+            }
+
+            @Override
             public void onRestart() {
                 context.field.clear();
-                context.tet = new FallingTetrimino(RANDOM);
+                nextTetrimino();
+                nextTetrimino();
                 context.state = GameState.RUN;
                 view.update(context);
                 game_timer.start();
@@ -111,9 +124,14 @@ public class TetrisWeeperEngine {
         });
 
         game_timer = new Timer(1000, e -> {
-            if (!context.tet.moveDown(context, MoveCause.GRAVITY)) context.tet = new FallingTetrimino(RANDOM);
+            if (!context.tet.moveDown(context, MoveCause.GRAVITY)) nextTetrimino();
             view.update(context);
             if (context.state == GameState.LOOSE) game_timer.stop();
         });
+    }
+
+    private void nextTetrimino() {
+        context.tet = context.next_tet;
+        context.next_tet = new FallingTetrimino(RANDOM);
     }
 }

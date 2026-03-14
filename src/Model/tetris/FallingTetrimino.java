@@ -29,6 +29,7 @@ public class FallingTetrimino {
     public Point[] getCellsPos() { return cells_pos; }
     public Cell[] getCells() { return cells; }
     public Point getPos() { return pos; }
+    public TetriminoType getType() { return type; }
 
     public boolean haveCollisions(Field field) {
         Point[] points = getCellsPos();

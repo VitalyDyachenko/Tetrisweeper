@@ -4,7 +4,7 @@ import Controller.Context;
 import Controller.GameMode;
 import Controller.GameState;
 import Model.minesweeper.Field;
-import Model.tetris.FallingTetrimino;
+import Model.tetris.TetriminoType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,6 +21,9 @@ public class GameView {
     private JLabel score_label;
     private JLabel stop_label;
     private JLayeredPane layered_pane;
+    private JPanel next_panel;
+    private JLabel next_tetrimino = new JLabel(TetriminoType.T.getIcon());
+
 
 
     private JButton restart_button;
@@ -37,6 +40,7 @@ public class GameView {
         void onRotateLeft();
         void onRotateRight();
 
+        void onStart();
         void onRestart();
         void onMenu();
         void onModeChanged(GameMode mode);
@@ -54,7 +58,7 @@ public class GameView {
         game_frame.setSize(FieldDrawer.FRAME_X, FieldDrawer.FRAME_Y);
         game_frame.setResizable(false);
         game_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        game_frame.setLocation(500, 50);
+        game_frame.setLocation(500, 10);
 
         createGameMenu();
         createMenuPanel();
@@ -129,15 +133,16 @@ public class GameView {
         score_label.setFont(new Font("Arial", Font.BOLD, 18));
         score_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel next_label = new JLabel("NEXT:");
+        JLabel next_label = new JLabel(" NEXT:");
         next_label.setFont(new Font("Arial", Font.BOLD, 18));
         next_label.setForeground(Color.WHITE);
         next_label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        //next_label.setVisible(false);
 
-        JPanel next_panel = new JPanel();
+        next_panel = new JPanel(new BorderLayout());
         next_panel.setBackground(Color.DARK_GRAY);
-        next_panel.setPreferredSize(new Dimension(FieldDrawer.SIZE*4, FieldDrawer.SIZE*4));
-        next_panel.setMaximumSize(new Dimension(FieldDrawer.SIZE*4, FieldDrawer.SIZE*4));
+        next_panel.setPreferredSize(new Dimension(FieldDrawer.SIZE*4 + 4, FieldDrawer.SIZE*4 + 4));
+        next_panel.setMaximumSize(new Dimension(FieldDrawer.SIZE*4 + 4, FieldDrawer.SIZE*4 + 4));
         next_panel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         restart_button = new JButton("RESTART");
@@ -166,7 +171,8 @@ public class GameView {
 
         game_info_panel.add(mode_label);
         game_info_panel.add(Box.createVerticalStrut(FieldDrawer.SIZE/2));
-        next_panel.add(next_label);
+        next_panel.add(next_label, BorderLayout.NORTH);
+        next_panel.add(next_tetrimino, BorderLayout.CENTER);
         game_info_panel.add(next_panel);
         game_info_panel.add(Box.createVerticalStrut(FieldDrawer.SIZE/2));
 
@@ -194,7 +200,7 @@ public class GameView {
         start_button.setFont(new Font("Arial", Font.PLAIN, 24));
         start_button.setAlignmentX(Component.CENTER_ALIGNMENT);
         start_button.addActionListener(e -> {
-            if (input_handler != null) input_handler.onRestart();
+            if (input_handler != null) input_handler.onStart();
         });
         start_button.setFocusable(false);
         start_button.setMargin(new Insets(5, 30, 5, 30));
@@ -291,6 +297,14 @@ public class GameView {
                 if (input_handler != null) input_handler.onPause();
             }
         });
+
+        input_map.put(KeyStroke.getKeyStroke("ENTER"), "switchStart");
+        action_map.put("switchStart", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (input_handler != null) input_handler.onStart();
+            }
+        });
     }
 
     public void update(Context context) {
@@ -322,5 +336,6 @@ public class GameView {
 
         mode_label.setText(context.mode.toString());
         score_label.setText("SCORE: " + context.score);
+        next_tetrimino.setIcon(context.next_tet.getType().getIcon());
     }
 }

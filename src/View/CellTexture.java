@@ -15,7 +15,7 @@ public enum CellTexture {
     private final ImageIcon icon;
 
     CellTexture(String fileName) {
-        this.icon = new ImageIcon("textures/" + fileName + ".png");
+        this.icon = new ImageIcon("resources/" + fileName + ".png");
     }
 
     public ImageIcon getIcon() {

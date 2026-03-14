@@ -10,4 +10,5 @@ public class Context {
 
     public Field field = new Field();
     public FallingTetrimino tet;
+    public FallingTetrimino next_tet;
 }
