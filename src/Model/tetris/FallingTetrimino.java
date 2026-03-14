@@ -40,7 +40,7 @@ public class FallingTetrimino {
         return false;
     }
 
-    public boolean move(Field field) {
+    public boolean moveDown(Field field) {
         pos.y++;
         if (haveCollisions(field)) {
             pos.y--;
@@ -53,6 +53,42 @@ public class FallingTetrimino {
         for (int i = 0; i < TETROMINO_SIZE; i++) {
             field.setCell(pos.x + cells_pos[i].x, pos.y + cells_pos[i].y, cells[i]);
         }
+    }
+    public boolean moveLeft(Field field) {
+        pos.x--;
+        if (haveCollisions(field)) {
+            pos.x++;
+            return false;
+        }
+        return true;
+    }
+    public boolean moveRight(Field field) {
+        pos.x++;
+        if (haveCollisions(field)) {
+            pos.x--;
+            return false;
+        }
+        return true;
+    }
+    public boolean rotateRight(Field field) {
+        rotation = Rotation.Right(rotation);
+        cells_pos = setCellsPos();
+        if (haveCollisions(field)) {
+            rotation = Rotation.Left(rotation);
+            cells_pos = setCellsPos();
+            return false;
+        }
+        return true;
+    }
+    public boolean rotateLeft(Field field) {
+        rotation = Rotation.Left(rotation);
+        cells_pos = setCellsPos();
+        if (haveCollisions(field)) {
+            rotation = Rotation.Right(rotation);
+            cells_pos = setCellsPos();
+            return false;
+        }
+        return true;
     }
 
     // Устанавливает координаты всех ячеек фигуры.
@@ -71,26 +107,26 @@ public class FallingTetrimino {
                 }
                 case Rotation.EAST -> {
                     yield new Point[]{
-                            new Point(1, 2),
                             new Point(1, 0),
+                            new Point(2, 1),
                             new Point(1, 1),
-                            new Point(2, 1)
+                            new Point(1, 2)
                     };
                 }
                 case Rotation.SOUTH -> {
                     yield new Point[]{
-                            new Point(0, 1),
+                            new Point(2, 1),
                             new Point(1, 2),
                             new Point(1, 1),
-                            new Point(2, 1)
+                            new Point(0, 1)
                     };
                 }
                 case Rotation.WEST -> {
                     yield new Point[]{
+                            new Point(1, 2),
                             new Point(0, 1),
-                            new Point(1, 0),
                             new Point(1, 1),
-                            new Point(1, 2)
+                            new Point(1, 0)
                     };
                 }
             };

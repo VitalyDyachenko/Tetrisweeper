@@ -16,6 +16,9 @@ public class GameView {
     public interface InputHandler {
         void onLeft();
         void onRight();
+        void onDown();
+        void onRotateLeft();
+        void onRotateRight();
 
         void onCellLeftClick(int x, int y);
         void onCellRightClick(int x, int y);
@@ -58,22 +61,47 @@ public class GameView {
     }
 
     private void setupKeyBindings() {
-        InputMap inputMap = main_panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        ActionMap actionMap = main_panel.getActionMap();
+        InputMap input_map = main_panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap action_map = main_panel.getActionMap();
 
-        inputMap.put(KeyStroke.getKeyStroke("LEFT"), "moveLeft");
-        actionMap.put("moveLeft", new AbstractAction() {
+        input_map.put(KeyStroke.getKeyStroke("LEFT"), "moveLeft");
+        action_map.put("moveLeft", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (input_handler != null) input_handler.onLeft();
             }
         });
 
-        inputMap.put(KeyStroke.getKeyStroke("RIGHT"), "moveRight");
-        actionMap.put("moveRight", new AbstractAction() {
+        input_map.put(KeyStroke.getKeyStroke("RIGHT"), "moveRight");
+        action_map.put("moveRight", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (input_handler != null) input_handler.onRight();
+            }
+        });
+
+        input_map.put(KeyStroke.getKeyStroke("DOWN"), "moveDown");
+        action_map.put("moveDown", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (input_handler != null) input_handler.onDown();
+            }
+        });
+
+        input_map.put(KeyStroke.getKeyStroke("Q"), "rotateLeft");
+        action_map.put("rotateLeft", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (input_handler != null) input_handler.onRotateLeft();
+            }
+        });
+
+        input_map.put(KeyStroke.getKeyStroke("W"), "rotateRight");
+        input_map.put(KeyStroke.getKeyStroke("UP"), "rotateRight");
+        action_map.put("rotateRight", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (input_handler != null) input_handler.onRotateRight();
             }
         });
     }

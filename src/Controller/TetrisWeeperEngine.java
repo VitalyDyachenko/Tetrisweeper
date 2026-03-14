@@ -18,15 +18,31 @@ public class TetrisWeeperEngine {
         view.setInputHandler(new GameView.InputHandler() {
             @Override
             public void onLeft() {
-                //tet.moveLeft(field);
-                System.out.println("Влево");
+                tet.moveLeft(field);
                 view.update(field, tet);
             }
 
             @Override
             public void onRight() {
-                //tet.moveRight(field);
-                System.out.println("Вправо");
+                tet.moveRight(field);
+                view.update(field, tet);
+            }
+
+            @Override
+            public void onDown() {
+                if (!tet.moveDown(field)) tet = new FallingTetrimino();
+                view.update(field, tet);
+            }
+
+            @Override
+            public void onRotateLeft() {
+                tet.rotateLeft(field);
+                view.update(field, tet);
+            }
+
+            @Override
+            public void onRotateRight() {
+                tet.rotateRight(field);
                 view.update(field, tet);
             }
 
@@ -49,7 +65,7 @@ public class TetrisWeeperEngine {
         view.update(field, tet);
         gameTimer = new Timer(1000, e -> {
             // Это выполняется в EDT
-            if (!tet.move(field)) tet = new FallingTetrimino();
+            if (!tet.moveDown(field)) tet = new FallingTetrimino();
             view.update(field, tet);
         });
         gameTimer.start();

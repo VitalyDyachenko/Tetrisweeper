@@ -43,12 +43,11 @@ public class FieldDrawer {
                     buttons[xi][yi].setBorder(model.isRollover() ? CELL_BORDER : null);
                 });
 
-                buttons[x][y].addActionListener(e -> {
-                    cell_handler.onLeftClick(xi, yi);
-                });
                 buttons[x][y].addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
-                        if (SwingUtilities.isRightMouseButton(e)) {
+                        if (SwingUtilities.isLeftMouseButton(e)) {
+                            cell_handler.onLeftClick(xi, yi);
+                        } else if (SwingUtilities.isRightMouseButton(e)) {
                             cell_handler.onRightClick(xi, yi);
                         }
                     }
