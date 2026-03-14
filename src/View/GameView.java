@@ -1,5 +1,6 @@
 package View;
 
+import Controller.Context;
 import Controller.GameMode;
 import Controller.GameState;
 import Model.minesweeper.Field;
@@ -16,10 +17,11 @@ public class GameView {
     private JPanel main_panel = new JPanel(new BorderLayout());
     private JPanel game_info_panel = new JPanel();
     private JPanel menu_panel;
+    private JLabel mode_label;
+    JLabel score_label;
 
     private JButton restart_button;
     private JButton menu_button;
-
     private JRadioButton tetris_mode;
     private JRadioButton tetrisweeper_mode;
     private ButtonGroup mode_group;
@@ -90,12 +92,12 @@ public class GameView {
         game_info_panel.setPreferredSize(new Dimension(5 * FieldDrawer.SIZE, Field.FIELD_Y * FieldDrawer.SIZE));
         game_info_panel.setLayout(new BoxLayout(game_info_panel, BoxLayout.Y_AXIS));
 
-        JLabel mode_label = new JLabel("TETRISWEEPER");
+        mode_label = new JLabel("TETRISWEEPER");
         mode_label.setFont(new Font("Arial", Font.BOLD, 18));
         mode_label.setAlignmentX(Component.CENTER_ALIGNMENT);
         //mode_label.setForeground(new Color(255, 255, 255));
 
-        JLabel score_label = new JLabel("SCORE: 12000");
+        score_label = new JLabel("SCORE:");
         score_label.setFont(new Font("Arial", Font.BOLD, 18));
         score_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -253,10 +255,10 @@ public class GameView {
         });
     }
 
-    public void update(Field f, FallingTetrimino tet, GameState state) {
-        field.update(f, tet);
+    public void update(Context context) {
+        field.update(context.field, context.tet);
 
-        if (state == GameState.MENU) {
+        if (context.state == GameState.MENU) {
             menu_panel.setVisible(true);
             game_info_panel.setVisible(false);
             game_panel.setVisible(false);
@@ -266,5 +268,8 @@ public class GameView {
             game_info_panel.setVisible(true);
             game_panel.setVisible(true);
         }
+
+        mode_label.setText(context.mode.toString());
+        score_label.setText("SCORE: " + context.score);
     }
 }

@@ -1,5 +1,6 @@
 package Model.tetris;
 
+import Controller.Context;
 import Model.minesweeper.Cell;
 import Model.minesweeper.Field;
 
@@ -42,20 +43,26 @@ public class FallingTetrimino {
         return false;
     }
 
-    public boolean moveDown(Field field) {
+    public boolean moveDown(Context context, MoveCause cause) {
         pos.y++;
-        if (haveCollisions(field)) {
+        if (haveCollisions(context.field)) {
             pos.y--;
-            setInField(field);
+            setInField(context);
             return false;
+        }
+        if (cause == MoveCause.SOFT_DROP) {
+            context.score++;
+        }
+        if (cause == MoveCause.HARD_DROP) {
+            context.score += 2;
         }
         return true;
     }
-    private void setInField(Field field) {
+    private void setInField(Context context) {
         for (int i = 0; i < TETROMINO_SIZE; i++) {
-            field.setCell(pos.x + cells_pos[i].x, pos.y + cells_pos[i].y, cells[i]);
+            context.field.setCell(pos.x + cells_pos[i].x, pos.y + cells_pos[i].y, cells[i]);
         }
-        field.removeLines();
+        context.field.removeLines(context);
     }
     public boolean moveLeft(Field field) {
         pos.x--;

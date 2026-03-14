@@ -1,5 +1,7 @@
 package Model.minesweeper;
 
+import Controller.Context;
+
 public class Field {
     public static final int FIELD_X = 10;
     public static final int FIELD_Y = 20;
@@ -19,7 +21,7 @@ public class Field {
     public Cell getCell(int x, int y) {
         return field[x][y];
     }
-    public void removeLines() {
+    public void removeLines(Context context) {
         int shift = 0;
         for (int y = 0; y < FIELD_Y; y++) {
             boolean is_line = true;
@@ -42,5 +44,9 @@ public class Field {
                 }
             }
         }
+        if (shift == 1) context.score += 100;
+        else if (shift == 2) context.score += 300;
+        else if (shift == 3) context.score += 500;
+        else if (shift == 4) context.score += 800;
     }
 }
