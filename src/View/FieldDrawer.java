@@ -8,6 +8,8 @@ import Model.tetris.TetriminoType;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class FieldDrawer {
     public static final int SIZE = 32;
@@ -18,7 +20,14 @@ public class FieldDrawer {
     private static final Border CELL_BORDER =
             BorderFactory.createLineBorder(new Color(100, 150, 255), 2);
 
-    public FieldDrawer(JPanel game_panel) {
+    public interface CellClickHandler {
+        void onLeftClick(int x, int y);
+        void onRightClick(int x, int y);
+    }
+    private CellClickHandler cell_handler;
+
+    public FieldDrawer(JPanel game_panel, CellClickHandler handler) {
+        cell_handler = handler;
         for (int y = 0; y < Field.FIELD_Y; y++) {
             for (int x = 0; x < Field.FIELD_X; x++) {
                 int xi = x;
@@ -27,6 +36,7 @@ public class FieldDrawer {
                 buttons[x][y].setFocusable(false);
                 buttons[x][y].setContentAreaFilled(false);
                 buttons[xi][yi].setBorder(null);
+                buttons[x][y].setRequestFocusEnabled(false);
 
                 buttons[x][y].getModel().addChangeListener(e -> {
                     ButtonModel model = (ButtonModel) e.getSource();
@@ -34,7 +44,14 @@ public class FieldDrawer {
                 });
 
                 buttons[x][y].addActionListener(e -> {
-                    System.out.println("Кнопка " + xi + " " + yi + " нажата");
+                    cell_handler.onLeftClick(xi, yi);
+                });
+                buttons[x][y].addMouseListener(new MouseAdapter() {
+                    public void mouseClicked(MouseEvent e) {
+                        if (SwingUtilities.isRightMouseButton(e)) {
+                            cell_handler.onRightClick(xi, yi);
+                        }
+                    }
                 });
 
                 game_panel.add(buttons[x][y]);
