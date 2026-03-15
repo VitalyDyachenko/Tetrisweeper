@@ -7,10 +7,18 @@ import Model.minesweeper.Field;
 import Model.tetris.TetriminoType;
 
 import javax.swing.*;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.*;
+import java.util.List;
 
 public class GameView {
+    private static final Color MENU_COLOR = new Color(49, 49, 49);
+    private static final Color MENU_TEXT_COLOR = new Color(210, 210, 210);
+
     private JFrame game_frame; // Окно
     private JPanel main_panel; // Главная панель
     private JPanel menu_panel; // Панель главного меню
@@ -23,6 +31,8 @@ public class GameView {
     private JLabel score_label;
     private JLabel srs_label;
     private JLabel next_tetrimino; // Картинка следющей фигуры
+    private JButton save_score_button;
+    private JTextArea record_list;
 
     public interface InputHandler {
         void onLeft();
@@ -40,6 +50,8 @@ public class GameView {
         void onModeChanged(GameMode mode);
         void onPause();
         void onSRSChanged(boolean enable);
+        void onRecordAdd();
+        void onRecordAdd(String name);
     }
     private InputHandler input_handler;
     public void setInputHandler(InputHandler handler) {
@@ -106,6 +118,25 @@ public class GameView {
         );
         stop_label.setVisible(false);
 
+        // Кнопка добавления рекорда
+        save_score_button = new JButton("SAVE MY SCORE");
+        save_score_button.setFont(new Font("Arial", Font.PLAIN, 16));
+        save_score_button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        save_score_button.addActionListener(e -> {
+            if (input_handler != null) input_handler.onRecordAdd();
+        });
+        save_score_button.setFocusable(false);
+        save_score_button.setMargin(new Insets(5, 30, 5, 30));
+        save_score_button.setBackground(new Color(52, 52, 52, 200));
+        save_score_button.setForeground(new Color(255, 255, 255, 200));
+        save_score_button.setVisible(false);
+        save_score_button.setBounds(
+                (Field.FIELD_X * FieldDrawer.SIZE - 200) / 2,
+                Field.FIELD_Y * FieldDrawer.SIZE / 2 + 50,
+                200,
+                50
+        );
+
         // Панель игры
         game_panel = new JLayeredPane();
         game_panel.setPreferredSize(new Dimension(
@@ -113,6 +144,7 @@ public class GameView {
                 Field.FIELD_Y * FieldDrawer.SIZE
         ));
         game_panel.add(stop_label, JLayeredPane.POPUP_LAYER);
+        game_panel.add(save_score_button, JLayeredPane.POPUP_LAYER);
         game_panel.add(field_panel, JLayeredPane.DEFAULT_LAYER);
 
         main_panel.add(game_panel, BorderLayout.WEST);
@@ -138,13 +170,13 @@ public class GameView {
         // Панель со следующей фигурой
         JLabel next_label = new JLabel(" NEXT:");
         next_label.setFont(new Font("Arial", Font.BOLD, 18));
-        next_label.setForeground(Color.WHITE);
+        next_label.setForeground(MENU_TEXT_COLOR);
         next_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         next_tetrimino = new JLabel(TetriminoType.T.getIcon());
 
         JPanel next_panel = new JPanel(new BorderLayout());
-        next_panel.setBackground(Color.DARK_GRAY);
+        next_panel.setBackground(new Color(40, 40, 40));
         next_panel.setPreferredSize(new Dimension(FieldDrawer.SIZE*4 + 4, FieldDrawer.SIZE*4 + 4));
         next_panel.setMaximumSize(new Dimension(FieldDrawer.SIZE*4 + 4, FieldDrawer.SIZE*4 + 4));
         next_panel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -153,7 +185,7 @@ public class GameView {
 
         // Кнопка рестарта
         JButton restart_button = new JButton("RESTART");
-        restart_button.setFont(new Font("Arial", Font.PLAIN, 16));
+        restart_button.setFont(new Font("Arial", Font.BOLD, 16));
         restart_button.setAlignmentX(Component.CENTER_ALIGNMENT);
         restart_button.addActionListener(e -> {
             if (input_handler != null) input_handler.onRestart();
@@ -161,11 +193,11 @@ public class GameView {
         restart_button.setFocusable(false);
         restart_button.setMargin(new Insets(5, 30, 5, 30));
         restart_button.setBackground(new Color(52, 52, 52));
-        restart_button.setForeground(new Color(255, 255, 255));
+        restart_button.setForeground(MENU_TEXT_COLOR);
 
         // Кнопка возврата в меню
         JButton menu_button = new JButton("MENU");
-        menu_button.setFont(new Font("Arial", Font.PLAIN, 16));
+        menu_button.setFont(new Font("Arial", Font.BOLD, 16));
         menu_button.setAlignmentX(Component.CENTER_ALIGNMENT);
         menu_button.addActionListener(e -> {
             if (input_handler != null) input_handler.onMenu();
@@ -173,7 +205,7 @@ public class GameView {
         menu_button.setFocusable(false);
         menu_button.setMargin(new Insets(5, 44, 5, 44));
         menu_button.setBackground(new Color(93, 93, 93));
-        menu_button.setForeground(new Color(255, 255, 255));
+        menu_button.setForeground(MENU_TEXT_COLOR);
 
         // Вся боковая панель
         game_info_panel = new JPanel();
@@ -202,9 +234,12 @@ public class GameView {
         title.setFont(new Font("Arial", Font.BOLD, 32));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        Icon normal_icon = new ImageIcon("resources/RadioButton icon 1.png");
+        Icon selected_icon = new ImageIcon("resources/RadioButton icon 2.png");
+
         // Кнопка режима Тетрис:
         JPanel tetris_mode_panel = new JPanel(new BorderLayout());
-        tetris_mode_panel.setBackground(Color.DARK_GRAY);
+        tetris_mode_panel.setBackground(MENU_COLOR);
         tetris_mode_panel.setMaximumSize(new Dimension(150, 30));
         tetris_mode_panel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -215,10 +250,16 @@ public class GameView {
         tetris_mode.addActionListener(e -> {
             if (input_handler != null) input_handler.onModeChanged(GameMode.TETRIS);
         });
+        tetris_mode.setBackground(MENU_COLOR);
+        tetris_mode.setForeground(MENU_TEXT_COLOR);
+        tetris_mode.setIcon(normal_icon);
+        tetris_mode.setSelectedIcon(selected_icon);
+        tetris_mode.setFocusPainted(false);
+        tetris_mode.setFont(new Font("Arial", Font.BOLD, 20));
 
         // Кнопка режима Тетрис-спёр
         JPanel tetrisweeper_mode_panel = new JPanel(new BorderLayout());
-        tetrisweeper_mode_panel.setBackground(Color.DARK_GRAY);
+        tetrisweeper_mode_panel.setBackground(MENU_COLOR);
         tetrisweeper_mode_panel.setMaximumSize(new Dimension(150, 30));
         tetrisweeper_mode_panel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -228,6 +269,12 @@ public class GameView {
         tetrisweeper_mode.addActionListener(e -> {
             if (input_handler != null) input_handler.onModeChanged(GameMode.TETRISWEEPER);
         });
+        tetrisweeper_mode.setBackground(MENU_COLOR);
+        tetrisweeper_mode.setForeground(MENU_TEXT_COLOR);
+        tetrisweeper_mode.setIcon(normal_icon);
+        tetrisweeper_mode.setSelectedIcon(selected_icon);
+        tetrisweeper_mode.setFocusPainted(false);
+        tetrisweeper_mode.setFont(new Font("Arial", Font.BOLD, 20));
 
         // Объединение tetrisweeper_mode и tetris_mode в группу
         ButtonGroup mode_group = new ButtonGroup();
@@ -236,7 +283,7 @@ public class GameView {
 
         // Панель выбора режима игры
         JPanel mode_panel = new JPanel();
-        mode_panel.setBackground(Color.DARK_GRAY);
+        mode_panel.setBackground(MENU_COLOR);
         mode_panel.setLayout(new BoxLayout(mode_panel, BoxLayout.Y_AXIS));
         mode_panel.setAlignmentX(Component.CENTER_ALIGNMENT);
         mode_panel.add(tetris_mode_panel);
@@ -245,8 +292,6 @@ public class GameView {
         // Кнопка выбора Super Rotation System
         JCheckBox srs_checkbox = new JCheckBox("Super Rotation System");
         srs_checkbox.setSelected(true);
-        srs_checkbox.setBackground(Color.DARK_GRAY);
-        srs_checkbox.setForeground(Color.WHITE);
         srs_checkbox.setFocusable(false);
         srs_checkbox.setAlignmentX(Component.CENTER_ALIGNMENT);
         srs_checkbox.addActionListener(e -> {
@@ -254,10 +299,64 @@ public class GameView {
                 input_handler.onSRSChanged(srs_checkbox.isSelected());
             }
         });
+        srs_checkbox.setBackground(MENU_COLOR);
+        srs_checkbox.setForeground(MENU_TEXT_COLOR);
+        srs_checkbox.setIcon(normal_icon);
+        srs_checkbox.setSelectedIcon(selected_icon);
+        //srs_checkbox.setFocusPainted(false);
+        srs_checkbox.setFont(new Font("Arial", Font.BOLD, 20));
+
+        // Таблица рекордов
+        record_list = new JTextArea();
+        record_list.setEditable(false);
+        record_list.setFont(new Font("Consolas", Font.BOLD, 18));
+        record_list.setFocusable(false);
+        record_list.setBackground(new Color(80, 80, 80));
+        record_list.setForeground(MENU_TEXT_COLOR);
+
+        JScrollPane record_panel = new JScrollPane(record_list);
+        record_panel.setPreferredSize(new Dimension(420, 200));
+        record_panel.setMaximumSize(new Dimension(420, 200));
+        record_panel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        record_panel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        record_panel.setBorder(null);
+        JScrollBar verticalBar = record_panel.getVerticalScrollBar();
+        verticalBar.setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
+            @Override
+            protected void configureScrollBarColors() {
+                this.thumbColor = new Color(51, 51, 51);
+                this.thumbDarkShadowColor = new Color(122, 122, 122);
+                this.thumbHighlightColor = new Color(122, 122, 122);
+                this.trackColor = new Color(40, 40, 40);
+            }
+            @Override
+            protected JButton createDecreaseButton(int orientation) {
+                return createZeroButton();
+            }
+            @Override
+            protected JButton createIncreaseButton(int orientation) {
+                return createZeroButton();
+            }
+            private JButton createZeroButton() {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(0, 0));
+                button.setMinimumSize(new Dimension(0, 0));
+                button.setMaximumSize(new Dimension(0, 0));
+                return button;
+            }
+        });
+
+        JLabel record_panel_title = new JLabel("BEST SCORE TABLE", SwingConstants.CENTER);
+        record_panel_title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        record_panel_title.setForeground(MENU_TEXT_COLOR);
+        record_panel_title.setFont(new Font("Arial", Font.BOLD, 20));
+        record_panel_title.setBackground(new Color(101, 101, 101));
+        record_panel_title.setOpaque(true);
+        record_panel_title.setMaximumSize(new Dimension(420, 40));
 
         // Кнопка старта
         JButton start_button = new JButton("START");
-        start_button.setFont(new Font("Arial", Font.PLAIN, 24));
+        start_button.setFont(new Font("Arial", Font.BOLD, 24));
         start_button.setAlignmentX(Component.CENTER_ALIGNMENT);
         start_button.addActionListener(e -> {
             if (input_handler != null) input_handler.onStart();
@@ -265,12 +364,12 @@ public class GameView {
         start_button.setFocusable(false);
         start_button.setMargin(new Insets(5, 30, 5, 30));
         start_button.setBackground(new Color(96, 96, 96));
-        start_button.setForeground(new Color(255, 255, 255));
+        start_button.setForeground(MENU_TEXT_COLOR);
         start_button.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Панель главного меню
         menu_panel = new JPanel();
-        menu_panel.setBackground(Color.DARK_GRAY);
+        menu_panel.setBackground(MENU_COLOR);
         menu_panel.setLayout(new BoxLayout(menu_panel, BoxLayout.Y_AXIS));
 
         menu_panel.add(Box.createVerticalStrut(50));
@@ -278,8 +377,11 @@ public class GameView {
         menu_panel.add(Box.createVerticalStrut(40));
         menu_panel.add(mode_panel);
         menu_panel.add(Box.createVerticalStrut(20));
+        menu_panel.add(record_panel_title);
+        menu_panel.add(record_panel);
+        menu_panel.add(Box.createVerticalStrut(20));
         menu_panel.add(srs_checkbox);
-        menu_panel.add(Box.createVerticalStrut(480));
+        menu_panel.add(Box.createVerticalStrut(200));
         menu_panel.add(start_button);
 
         main_panel.add(menu_panel, BorderLayout.CENTER);
@@ -367,18 +469,63 @@ public class GameView {
             if (context.state == GameState.LOOSE) {
                 stop_label.setText("GAME OVER");
                 stop_label.setVisible(true);
+                save_score_button.setVisible(true);
             }
             else if (context.state == GameState.PAUSE) {
                 stop_label.setText("PAUSE");
                 stop_label.setVisible(true);
+                save_score_button.setVisible(false);
             }
             else {
                 stop_label.setVisible(false);
+                save_score_button.setVisible(false);
             }
         }
 
         mode_label.setText(context.mode.toString());
         score_label.setText("SCORE: " + context.score);
         srs_label.setText("SRS: " + (context.super_rotation_system ? "ON" : "OFF"));
+    }
+    public void updateScores(List<Map.Entry<String, Integer>> scores) {
+        StringBuilder sb = new StringBuilder();
+        int place = 1;
+        for (Map.Entry<String, Integer> entry : scores) {
+            sb.append(String.format("%3d. %-24s %7d\n",
+                    place++, entry.getKey(), entry.getValue()));
+        }
+
+        record_list.setText(sb.toString());
+    }
+    public void addRecordWindow() {
+        JFrame record_window = new JFrame("Save score");
+
+        JTextField text_field = new JTextField();
+        text_field.setColumns(24);
+        text_field.setDocument(new PlainDocument() {
+            @Override
+            public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+                if (str == null) return;
+
+                // Проверяем, не превысит ли лимит
+                if ((getLength() + str.length()) <= 24) {
+                    super.insertString(offs, str, a);
+                }
+            }
+        });
+        text_field.addActionListener(e -> {
+            if (input_handler != null) input_handler.onRecordAdd(text_field.getText());
+            record_window.dispose();
+        });
+
+        JPanel panel = new JPanel(new FlowLayout());
+        panel.add(new JLabel("Your name:"));
+        panel.add(text_field);
+
+        record_window.setSize(300, 100);
+        record_window.setResizable(false);
+        record_window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        record_window.setLocation(540, 300);
+        record_window.setVisible(true);
+        record_window.add(panel);
     }
 }

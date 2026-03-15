@@ -4,6 +4,7 @@ import Model.minesweeper.Field;
 import Model.tetris.FallingTetrimino;
 import Model.tetris.MoveCause;
 import View.GameView;
+import best_score.BestScoreTable;
 
 import javax.swing.Timer;
 import java.util.Random;
@@ -14,6 +15,8 @@ public class TetrisWeeperEngine {
     private GameView view = new GameView();
     private Timer game_timer;
     private static final Random RANDOM = new Random();
+    private BestScoreTable tetris_best = new BestScoreTable("src/best_score/tetris_best.properties");
+    private BestScoreTable tetrisweeper_best = new BestScoreTable("src/best_score/tetrisweeper_best.properties");
 
     public TetrisWeeperEngine() {
         view.setInputHandler(new GameView.InputHandler() {
@@ -24,7 +27,6 @@ public class TetrisWeeperEngine {
                     view.update(context);
                 }
             }
-
             @Override
             public void onRight() {
                 if (context.state == GameState.RUN) {
@@ -32,7 +34,6 @@ public class TetrisWeeperEngine {
                     view.update(context);
                 }
             }
-
             @Override
             public void onDown() {
                 if (context.state == GameState.RUN) {
@@ -48,7 +49,6 @@ public class TetrisWeeperEngine {
                     view.update(context);
                 }
             }
-
             @Override
             public void onRotateRight() {
                 if (context.state == GameState.RUN) {
@@ -66,7 +66,6 @@ public class TetrisWeeperEngine {
                     view.update(context);
                 }
             }
-
             @Override
             public void onCellRightClick(int x, int y) {
                 if (context.state == GameState.RUN) {
@@ -76,12 +75,6 @@ public class TetrisWeeperEngine {
             }
 
 
-
-            @Override
-            public void onModeChanged(GameMode new_mode) {
-                context.mode = new_mode;
-                view.update(context);
-            }
 
             @Override
             public void onStart() {
@@ -94,7 +87,6 @@ public class TetrisWeeperEngine {
                     game_timer.start();
                 }
             }
-
             @Override
             public void onRestart() {
                 context.field.clear();
@@ -104,7 +96,6 @@ public class TetrisWeeperEngine {
                 view.update(context);
                 game_timer.start();
             }
-
             @Override
             public void onMenu() {
                 context.state = GameState.MENU;
@@ -123,9 +114,29 @@ public class TetrisWeeperEngine {
                 }
                 view.update(context);
             }
+
+            @Override
+            public void onModeChanged(GameMode new_mode) {
+                context.mode = new_mode;
+                view.update(context);
+                updateScores();
+            }
+            @Override
             public void onSRSChanged(boolean enable) {
                 context.super_rotation_system = enable;
                 view.update(context);
+            }
+
+            @Override
+            public void onRecordAdd() {
+                view.addRecordWindow();
+                view.update(context);
+            }
+            @Override
+            public void onRecordAdd(String name) {
+                tetris_best.addScore(name, context.score);
+                view.update(context);
+                updateScores();
             }
         });
 
@@ -134,10 +145,19 @@ public class TetrisWeeperEngine {
             view.update(context);
             if (context.state == GameState.LOOSE) game_timer.stop();
         });
+
+        updateScores();
     }
 
     private void nextTetrimino() {
         context.tet = context.next_tet;
         context.next_tet = new FallingTetrimino(RANDOM);
+    }
+
+    private void updateScores() {
+        if (context.mode == GameMode.TETRIS)
+            view.updateScores(tetris_best.getScores());
+        else if (context.mode == GameMode.TETRISWEEPER)
+            view.updateScores(tetrisweeper_best.getScores());
     }
 }
