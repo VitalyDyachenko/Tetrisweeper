@@ -44,7 +44,7 @@ public class TetrisWeeperEngine {
             @Override
             public void onRotateLeft() {
                 if (context.state == GameState.RUN) {
-                    context.tet.rotateLeft(context.field);
+                    context.tet.rotateLeft(context);
                     view.update(context);
                 }
             }
@@ -52,7 +52,7 @@ public class TetrisWeeperEngine {
             @Override
             public void onRotateRight() {
                 if (context.state == GameState.RUN) {
-                    context.tet.rotateRight(context.field);
+                    context.tet.rotateRight(context);
                     view.update(context);
                 }
             }

@@ -11,6 +11,7 @@ import java.util.Random;
 
 public class FallingTetrimino {
     public static final int TETROMINO_SIZE = 4;
+    public static final int SRS_POINTS_COUNT = 4;
 
     TetriminoType type;
     Rotation rotation = Rotation.NORTH;
@@ -88,20 +89,48 @@ public class FallingTetrimino {
         }
         return true;
     }
-    public boolean rotateRight(Field field) {
+    public boolean rotateRight(Context context) {
         rotation = Rotation.Right(rotation);
         cells_pos = setCellsPos();
-        if (haveCollisions(field)) {
+        if (haveCollisions(context.field)) {
+            if (context.super_rotation_system) {
+                Point[] srs_shifts = getSuperRotationSystemShifts(Rotation.Left(rotation),false);
+                int last_x = pos.x;
+                int last_y = pos.y;
+                for (int i = 0; i < SRS_POINTS_COUNT; i++) {
+                    pos.x = last_x + srs_shifts[i].x;
+                    pos.y = last_y + srs_shifts[i].y;
+                    if (!haveCollisions(context.field)) {
+                        return true;
+                    }
+                }
+                pos.x = last_x;
+                pos.y = last_y;
+            }
             rotation = Rotation.Left(rotation);
             cells_pos = setCellsPos();
             return false;
         }
         return true;
     }
-    public boolean rotateLeft(Field field) {
+    public boolean rotateLeft(Context context) {
         rotation = Rotation.Left(rotation);
         cells_pos = setCellsPos();
-        if (haveCollisions(field)) {
+        if (haveCollisions(context.field)) {
+            if (context.super_rotation_system) {
+                Point[] srs_shifts = getSuperRotationSystemShifts(Rotation.Right(rotation), true);
+                int last_x = pos.x;
+                int last_y = pos.y;
+                for (int i = 0; i < SRS_POINTS_COUNT; i++) {
+                    pos.x = last_x + srs_shifts[i].x;
+                    pos.y = last_y + srs_shifts[i].y;
+                    if (!haveCollisions(context.field)) {
+                        return true;
+                    }
+                }
+                pos.x = last_x;
+                pos.y = last_y;
+            }
             rotation = Rotation.Right(rotation);
             cells_pos = setCellsPos();
             return false;
@@ -351,6 +380,221 @@ public class FallingTetrimino {
                             new Point(1, 0),
                     };
                 }
+            };
+        };
+    }
+
+    public Point[] getSuperRotationSystemShifts(Rotation last_direction, boolean is_left_rotation) {
+        return switch (type) {
+            case I -> switch (last_direction) {
+                case Rotation.NORTH -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(-1, 0) : new Point(-2, 0),
+                            is_left_rotation ? new Point(2, 0) : new Point(1, 0),
+                            is_left_rotation ? new Point(-1, -2) : new Point(-2, 1),
+                            is_left_rotation ? new Point(2, 1) : new Point(1, -2),
+                    };
+                }
+                case Rotation.EAST -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(2, 0) : new Point(-1, 0),
+                            is_left_rotation ? new Point(-1, 0) : new Point(2, 0),
+                            is_left_rotation ? new Point(2, -1) : new Point(-1, -2),
+                            is_left_rotation ? new Point(-1, 2) : new Point(2, 1),
+                    };
+                }
+                case Rotation.SOUTH -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(1, 0) : new Point(2, 0),
+                            is_left_rotation ? new Point(-2, 0) : new Point(-1, 0),
+                            is_left_rotation ? new Point(1, 2) : new Point(2, -1),
+                            is_left_rotation ? new Point(-2, -1) : new Point(-1, 2),
+                    };
+                }
+                case Rotation.WEST -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(-2, 0) : new Point(1, 0),
+                            is_left_rotation ? new Point(1, 0) : new Point(-2, 0),
+                            is_left_rotation ? new Point(-2, 1) : new Point(1, 2),
+                            is_left_rotation ? new Point(1, -2) : new Point(-2, -1),
+                    };
+                }
+            };
+            case T -> switch (rotation) {
+                case Rotation.NORTH -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(1, 0) : new Point(-1, 0),
+                            is_left_rotation ? new Point(1, -1) : new Point(-1, -1),
+                            is_left_rotation ? new Point(0, 0) : new Point(0, 0),
+                            is_left_rotation ? new Point(1, 2) : new Point(-1, 2),
+                    };
+                }
+                case Rotation.EAST -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(1, 0) : new Point(1, 0),
+                            is_left_rotation ? new Point(1, 1) : new Point(1, 1),
+                            is_left_rotation ? new Point(0, -2) : new Point(0, -2),
+                            is_left_rotation ? new Point(1, -2) : new Point(1, -2),
+                    };
+                }
+                case Rotation.SOUTH -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(-1, 0) : new Point(1, 0),
+                            is_left_rotation ? new Point(0, 0) : new Point(0, 0),
+                            is_left_rotation ? new Point(0, 2) : new Point(0, 2),
+                            is_left_rotation ? new Point(-1, 2) : new Point(1, 2),
+                    };
+                }
+                case Rotation.WEST -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(-1, 0) : new Point(-1, 0),
+                            is_left_rotation ? new Point(-1, 1) : new Point(-1, 1),
+                            is_left_rotation ? new Point(0, -2) : new Point(0, -2),
+                            is_left_rotation ? new Point(-1, -2) : new Point(-1, -2),
+                    };
+                }
+            };
+            case L -> switch (rotation) {
+                case Rotation.NORTH -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(1, 0) : new Point(-1, 0),
+                            is_left_rotation ? new Point(1, -1) : new Point(-1, -1),
+                            is_left_rotation ? new Point(0, 2) : new Point(0, 2),
+                            is_left_rotation ? new Point(1, 2) : new Point(-1, 2),
+                    };
+                }
+                case Rotation.EAST -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(1, 0) : new Point(1, 0),
+                            is_left_rotation ? new Point(1, 1) : new Point(1, 1),
+                            is_left_rotation ? new Point(0, -2) : new Point(0, -2),
+                            is_left_rotation ? new Point(1, -2) : new Point(1, -2),
+                    };
+                }
+                case Rotation.SOUTH -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(-1, 0) : new Point(1, 0),
+                            is_left_rotation ? new Point(-1, -1) : new Point(1, -1),
+                            is_left_rotation ? new Point(0, 2) : new Point(0, 2),
+                            is_left_rotation ? new Point(-1, 2) : new Point(1, 2),
+                    };
+                }
+                case Rotation.WEST -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(-1, 0) : new Point(-1, 0),
+                            is_left_rotation ? new Point(-1, 1) : new Point(-1, 1),
+                            is_left_rotation ? new Point(0, -2) : new Point(0, -2),
+                            is_left_rotation ? new Point(-1, -2) : new Point(-1, -2),
+                    };
+                }
+            };
+            case J -> switch (rotation) {
+                case Rotation.NORTH -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(1, 0) : new Point(-1, 0),
+                            is_left_rotation ? new Point(1, -1) : new Point(-1, -1),
+                            is_left_rotation ? new Point(0, 2) : new Point(0, 2),
+                            is_left_rotation ? new Point(1, 2) : new Point(-1, 2),
+                    };
+                }
+                case Rotation.EAST -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(1, 0) : new Point(1, 0),
+                            is_left_rotation ? new Point(1, 1) : new Point(1, 1),
+                            is_left_rotation ? new Point(0, -2) : new Point(0, -2),
+                            is_left_rotation ? new Point(1, -2) : new Point(1, -2),
+                    };
+                }
+                case Rotation.SOUTH -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(-1, 0) : new Point(1, 0),
+                            is_left_rotation ? new Point(-1, -1) : new Point(1, -1),
+                            is_left_rotation ? new Point(0, 2) : new Point(0, 2),
+                            is_left_rotation ? new Point(-1, 2) : new Point(1, 2),
+                    };
+                }
+                case Rotation.WEST -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(-1, 0) : new Point(-1, 0),
+                            is_left_rotation ? new Point(-1, 1) : new Point(-1, 1),
+                            is_left_rotation ? new Point(0, -2) : new Point(0, -2),
+                            is_left_rotation ? new Point(-1, -2) : new Point(-1, -2),
+                    };
+                }
+            };
+            case S -> switch (rotation) {
+                case Rotation.NORTH -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(1, 0) : new Point(-1, 0),
+                            is_left_rotation ? new Point(1, -1) : new Point(-1, -1),
+                            is_left_rotation ? new Point(0, 2) : new Point(0, 2),
+                            is_left_rotation ? new Point(1, 2) : new Point(-1, 2),
+                    };
+                }
+                case Rotation.EAST -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(1, 0) : new Point(1, 0),
+                            is_left_rotation ? new Point(1, 1) : new Point(1, 1),
+                            is_left_rotation ? new Point(0, -2) : new Point(0, -2),
+                            is_left_rotation ? new Point(1, -2) : new Point(1, -2),
+                    };
+                }
+                case Rotation.SOUTH -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(-1, 0) : new Point(1, 0),
+                            is_left_rotation ? new Point(-1, -1) : new Point(1, -1),
+                            is_left_rotation ? new Point(0, 2) : new Point(0, 2),
+                            is_left_rotation ? new Point(-1, 2) : new Point(1, 2),
+                    };
+                }
+                case Rotation.WEST -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(-1, 0) : new Point(-1, 0),
+                            is_left_rotation ? new Point(-1, 1) : new Point(-1, 1),
+                            is_left_rotation ? new Point(0, -2) : new Point(0, -2),
+                            is_left_rotation ? new Point(-1, -2) : new Point(-1, -2),
+                    };
+                }
+            };
+            case Z -> switch (rotation) {
+                case Rotation.NORTH -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(1, 0) : new Point(-1, 0),
+                            is_left_rotation ? new Point(1, -1) : new Point(-1, -1),
+                            is_left_rotation ? new Point(0, 2) : new Point(0, 2),
+                            is_left_rotation ? new Point(1, 2) : new Point(-1, 2),
+                    };
+                }
+                case Rotation.EAST -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(1, 0) : new Point(1, 0),
+                            is_left_rotation ? new Point(1, 1) : new Point(1, 1),
+                            is_left_rotation ? new Point(0, -2) : new Point(0, -2),
+                            is_left_rotation ? new Point(1, -2) : new Point(1, -2),
+                    };
+                }
+                case Rotation.SOUTH -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(-1, 0) : new Point(1, 0),
+                            is_left_rotation ? new Point(-1, -1) : new Point(1, -1),
+                            is_left_rotation ? new Point(0, 2) : new Point(0, 2),
+                            is_left_rotation ? new Point(-1, 2) : new Point(1, 2),
+                    };
+                }
+                case Rotation.WEST -> {
+                    yield new Point[] {
+                            is_left_rotation ? new Point(-1, 0) : new Point(-1, 0),
+                            is_left_rotation ? new Point(-1, 1) : new Point(-1, 1),
+                            is_left_rotation ? new Point(0, -2) : new Point(0, -2),
+                            is_left_rotation ? new Point(-1, -2) : new Point(-1, -2),
+                    };
+                }
+            };
+            case O -> new Point[] {
+                    new Point(0, 0),
+                    new Point(0, 0),
+                    new Point(0, 0),
+                    new Point(0, 0),
             };
         };
     }
