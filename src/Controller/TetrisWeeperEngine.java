@@ -60,6 +60,24 @@ public class TetrisWeeperEngine {
 
 
             @Override
+            public void onCellLeftClick(int x, int y) {
+                if (context.state == GameState.RUN) {
+                    System.out.println("Левая кнопка " + x + " " + y + " нажата");
+                    view.update(context);
+                }
+            }
+
+            @Override
+            public void onCellRightClick(int x, int y) {
+                if (context.state == GameState.RUN) {
+                    System.out.println("Правая кнопка " + x + " " + y + " нажата");
+                    view.update(context);
+                }
+            }
+
+
+
+            @Override
             public void onModeChanged(GameMode new_mode) {
                 context.mode = new_mode;
                 view.update(context);
@@ -105,21 +123,9 @@ public class TetrisWeeperEngine {
                 }
                 view.update(context);
             }
-
-            @Override
-            public void onCellLeftClick(int x, int y) {
-                if (context.state == GameState.RUN) {
-                    System.out.println("Левая кнопка " + x + " " + y + " нажата");
-                    view.update(context);
-                }
-            }
-
-            @Override
-            public void onCellRightClick(int x, int y) {
-                if (context.state == GameState.RUN) {
-                    System.out.println("Правая кнопка " + x + " " + y + " нажата");
-                    view.update(context);
-                }
+            public void onSRSChanged(boolean enable) {
+                context.super_rotation_system = enable;
+                view.update(context);
             }
         });
 
