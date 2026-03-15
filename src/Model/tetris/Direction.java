@@ -1,8 +1,8 @@
 package Model.tetris;
 
-public enum Rotation {
+public enum Direction {
     NORTH, EAST, SOUTH, WEST;
-    public static Rotation Right(Rotation cur) {
+    public static Direction Right(Direction cur) {
         return switch (cur) {
             case NORTH -> EAST;
             case EAST -> SOUTH;
@@ -10,7 +10,7 @@ public enum Rotation {
             case WEST -> NORTH;
         };
     }
-    public static Rotation Left(Rotation cur) {
+    public static Direction Left(Direction cur) {
         return switch (cur) {
             case NORTH -> WEST;
             case EAST -> NORTH;

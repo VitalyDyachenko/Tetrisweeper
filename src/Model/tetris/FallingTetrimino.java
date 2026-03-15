@@ -4,7 +4,6 @@ import Controller.Context;
 import Controller.GameState;
 import Model.minesweeper.Cell;
 import Model.minesweeper.Field;
-import View.FieldDrawer;
 
 import java.awt.*;
 import java.util.Random;
@@ -14,7 +13,7 @@ public class FallingTetrimino {
     public static final int SRS_POINTS_COUNT = 4;
 
     TetriminoType type;
-    Rotation rotation = Rotation.NORTH;
+    Direction direction = Direction.NORTH;
     Point pos = new Point(Field.FIELD_X/2 - 1, -1);
     Cell[] cells = new Cell[TETROMINO_SIZE];
     Point[] cells_pos = new Point[TETROMINO_SIZE];
@@ -90,11 +89,12 @@ public class FallingTetrimino {
         return true;
     }
     public boolean rotateRight(Context context) {
-        rotation = Rotation.Right(rotation);
+        Direction last_direction = direction;
+        direction = Direction.Right(direction);
         cells_pos = setCellsPos();
         if (haveCollisions(context.field)) {
             if (context.super_rotation_system) {
-                Point[] srs_shifts = getSuperRotationSystemShifts(Rotation.Left(rotation),false);
+                Point[] srs_shifts = getSuperRotationSystemShifts(last_direction,false);
                 int last_x = pos.x;
                 int last_y = pos.y;
                 for (int i = 0; i < SRS_POINTS_COUNT; i++) {
@@ -107,18 +107,19 @@ public class FallingTetrimino {
                 pos.x = last_x;
                 pos.y = last_y;
             }
-            rotation = Rotation.Left(rotation);
+            direction = last_direction;
             cells_pos = setCellsPos();
             return false;
         }
         return true;
     }
     public boolean rotateLeft(Context context) {
-        rotation = Rotation.Left(rotation);
+        Direction last_direction = direction;
+        direction = Direction.Left(direction);
         cells_pos = setCellsPos();
         if (haveCollisions(context.field)) {
             if (context.super_rotation_system) {
-                Point[] srs_shifts = getSuperRotationSystemShifts(Rotation.Right(rotation), true);
+                Point[] srs_shifts = getSuperRotationSystemShifts(last_direction, true);
                 int last_x = pos.x;
                 int last_y = pos.y;
                 for (int i = 0; i < SRS_POINTS_COUNT; i++) {
@@ -131,7 +132,7 @@ public class FallingTetrimino {
                 pos.x = last_x;
                 pos.y = last_y;
             }
-            rotation = Rotation.Right(rotation);
+            direction = last_direction;
             cells_pos = setCellsPos();
             return false;
         }
@@ -143,8 +144,8 @@ public class FallingTetrimino {
     // ось x направлена вправо, y - вниз.
     public Point[] setCellsPos() {
         return switch (type) {
-            case T -> switch (rotation) {
-                case Rotation.NORTH -> {
+            case T -> switch (direction) {
+                case Direction.NORTH -> {
                     yield new Point[]{
                             new Point(0, 1),
                             new Point(1, 0),
@@ -152,7 +153,7 @@ public class FallingTetrimino {
                             new Point(2, 1),
                     };
                 }
-                case Rotation.EAST -> {
+                case Direction.EAST -> {
                     yield new Point[]{
                             new Point(1, 0),
                             new Point(2, 1),
@@ -160,7 +161,7 @@ public class FallingTetrimino {
                             new Point(1, 2),
                     };
                 }
-                case Rotation.SOUTH -> {
+                case Direction.SOUTH -> {
                     yield new Point[]{
                             new Point(2, 1),
                             new Point(1, 2),
@@ -168,7 +169,7 @@ public class FallingTetrimino {
                             new Point(0, 1),
                     };
                 }
-                case Rotation.WEST -> {
+                case Direction.WEST -> {
                     yield new Point[]{
                             new Point(1, 2),
                             new Point(0, 1),
@@ -177,8 +178,8 @@ public class FallingTetrimino {
                     };
                 }
             };
-            case O -> switch (rotation) {
-                case Rotation.NORTH -> {
+            case O -> switch (direction) {
+                case Direction.NORTH -> {
                     yield new Point[]{
                             new Point(0, 0),
                             new Point(1, 0),
@@ -186,7 +187,7 @@ public class FallingTetrimino {
                             new Point(0, 1),
                     };
                 }
-                case Rotation.EAST -> {
+                case Direction.EAST -> {
                     yield new Point[]{
                             new Point(1, 0),
                             new Point(1, 1),
@@ -194,7 +195,7 @@ public class FallingTetrimino {
                             new Point(0, 0),
                     };
                 }
-                case Rotation.SOUTH -> {
+                case Direction.SOUTH -> {
                     yield new Point[]{
                             new Point(1, 1),
                             new Point(0, 1),
@@ -202,7 +203,7 @@ public class FallingTetrimino {
                             new Point(1, 0),
                     };
                 }
-                case Rotation.WEST -> {
+                case Direction.WEST -> {
                     yield new Point[]{
                             new Point(0, 1),
                             new Point(0, 0),
@@ -211,8 +212,8 @@ public class FallingTetrimino {
                     };
                 }
             };
-            case I -> switch (rotation) {
-                case Rotation.NORTH -> {
+            case I -> switch (direction) {
+                case Direction.NORTH -> {
                     yield new Point[]{
                             new Point(0, 1),
                             new Point(1, 1),
@@ -220,7 +221,7 @@ public class FallingTetrimino {
                             new Point(3, 1),
                     };
                 }
-                case Rotation.EAST -> {
+                case Direction.EAST -> {
                     yield new Point[]{
                             new Point(2, 0),
                             new Point(2, 1),
@@ -228,7 +229,7 @@ public class FallingTetrimino {
                             new Point(2, 3),
                     };
                 }
-                case Rotation.SOUTH -> {
+                case Direction.SOUTH -> {
                     yield new Point[]{
                             new Point(3, 2),
                             new Point(2, 2),
@@ -236,7 +237,7 @@ public class FallingTetrimino {
                             new Point(0, 2),
                     };
                 }
-                case Rotation.WEST -> {
+                case Direction.WEST -> {
                     yield new Point[]{
                             new Point(1, 3),
                             new Point(1, 2),
@@ -245,8 +246,8 @@ public class FallingTetrimino {
                     };
                 }
             };
-            case S -> switch (rotation) {
-                case Rotation.NORTH -> {
+            case S -> switch (direction) {
+                case Direction.NORTH -> {
                     yield new Point[]{
                             new Point(0, 1),
                             new Point(1, 1),
@@ -254,7 +255,7 @@ public class FallingTetrimino {
                             new Point(2, 0),
                     };
                 }
-                case Rotation.EAST -> {
+                case Direction.EAST -> {
                     yield new Point[]{
                             new Point(1, 0),
                             new Point(1, 1),
@@ -262,7 +263,7 @@ public class FallingTetrimino {
                             new Point(2, 2),
                     };
                 }
-                case Rotation.SOUTH -> {
+                case Direction.SOUTH -> {
                     yield new Point[]{
                             new Point(2, 1),
                             new Point(1, 1),
@@ -270,7 +271,7 @@ public class FallingTetrimino {
                             new Point(0, 2),
                     };
                 }
-                case Rotation.WEST -> {
+                case Direction.WEST -> {
                     yield new Point[]{
                             new Point(1, 2),
                             new Point(1, 1),
@@ -279,8 +280,8 @@ public class FallingTetrimino {
                     };
                 }
             };
-            case Z -> switch (rotation) {
-                case Rotation.NORTH -> {
+            case Z -> switch (direction) {
+                case Direction.NORTH -> {
                     yield new Point[]{
                             new Point(0, 0),
                             new Point(1, 0),
@@ -288,7 +289,7 @@ public class FallingTetrimino {
                             new Point(2, 1),
                     };
                 }
-                case Rotation.EAST -> {
+                case Direction.EAST -> {
                     yield new Point[]{
                             new Point(2, 0),
                             new Point(2, 1),
@@ -296,7 +297,7 @@ public class FallingTetrimino {
                             new Point(1, 2),
                     };
                 }
-                case Rotation.SOUTH -> {
+                case Direction.SOUTH -> {
                     yield new Point[]{
                             new Point(2, 2),
                             new Point(1, 2),
@@ -304,7 +305,7 @@ public class FallingTetrimino {
                             new Point(0, 1),
                     };
                 }
-                case Rotation.WEST -> {
+                case Direction.WEST -> {
                     yield new Point[]{
                             new Point(0, 2),
                             new Point(0, 1),
@@ -313,8 +314,8 @@ public class FallingTetrimino {
                     };
                 }
             };
-            case L -> switch (rotation) {
-                case Rotation.NORTH -> {
+            case L -> switch (direction) {
+                case Direction.NORTH -> {
                     yield new Point[]{
                             new Point(0, 1),
                             new Point(1, 1),
@@ -322,7 +323,7 @@ public class FallingTetrimino {
                             new Point(2, 0),
                     };
                 }
-                case Rotation.EAST -> {
+                case Direction.EAST -> {
                     yield new Point[]{
                             new Point(1, 0),
                             new Point(1, 1),
@@ -330,7 +331,7 @@ public class FallingTetrimino {
                             new Point(2, 2),
                     };
                 }
-                case Rotation.SOUTH -> {
+                case Direction.SOUTH -> {
                     yield new Point[]{
                             new Point(2, 1),
                             new Point(1, 1),
@@ -338,7 +339,7 @@ public class FallingTetrimino {
                             new Point(0, 2),
                     };
                 }
-                case Rotation.WEST -> {
+                case Direction.WEST -> {
                     yield new Point[]{
                             new Point(1, 2),
                             new Point(1, 1),
@@ -347,8 +348,8 @@ public class FallingTetrimino {
                     };
                 }
             };
-            case J -> switch (rotation) {
-                case Rotation.NORTH -> {
+            case J -> switch (direction) {
+                case Direction.NORTH -> {
                     yield new Point[]{
                             new Point(0, 0),
                             new Point(0, 1),
@@ -356,7 +357,7 @@ public class FallingTetrimino {
                             new Point(2, 1),
                     };
                 }
-                case Rotation.EAST -> {
+                case Direction.EAST -> {
                     yield new Point[]{
                             new Point(2, 0),
                             new Point(1, 0),
@@ -364,7 +365,7 @@ public class FallingTetrimino {
                             new Point(1, 2),
                     };
                 }
-                case Rotation.SOUTH -> {
+                case Direction.SOUTH -> {
                     yield new Point[]{
                             new Point(2, 2),
                             new Point(2, 1),
@@ -372,7 +373,7 @@ public class FallingTetrimino {
                             new Point(0, 1),
                     };
                 }
-                case Rotation.WEST -> {
+                case Direction.WEST -> {
                     yield new Point[]{
                             new Point(0, 2),
                             new Point(1, 2),
@@ -384,10 +385,10 @@ public class FallingTetrimino {
         };
     }
 
-    public Point[] getSuperRotationSystemShifts(Rotation last_direction, boolean is_left_rotation) {
+    public Point[] getSuperRotationSystemShifts(Direction last_direction, boolean is_left_rotation) {
         return switch (type) {
             case I -> switch (last_direction) {
-                case Rotation.NORTH -> {
+                case Direction.NORTH -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(-1, 0) : new Point(-2, 0),
                             is_left_rotation ? new Point(2, 0) : new Point(1, 0),
@@ -395,7 +396,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(2, 1) : new Point(1, -2),
                     };
                 }
-                case Rotation.EAST -> {
+                case Direction.EAST -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(2, 0) : new Point(-1, 0),
                             is_left_rotation ? new Point(-1, 0) : new Point(2, 0),
@@ -403,7 +404,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(-1, 2) : new Point(2, 1),
                     };
                 }
-                case Rotation.SOUTH -> {
+                case Direction.SOUTH -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(1, 0) : new Point(2, 0),
                             is_left_rotation ? new Point(-2, 0) : new Point(-1, 0),
@@ -411,7 +412,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(-2, -1) : new Point(-1, 2),
                     };
                 }
-                case Rotation.WEST -> {
+                case Direction.WEST -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(-2, 0) : new Point(1, 0),
                             is_left_rotation ? new Point(1, 0) : new Point(-2, 0),
@@ -420,8 +421,8 @@ public class FallingTetrimino {
                     };
                 }
             };
-            case T -> switch (rotation) {
-                case Rotation.NORTH -> {
+            case T -> switch (last_direction) {
+                case Direction.NORTH -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(1, 0) : new Point(-1, 0),
                             is_left_rotation ? new Point(1, -1) : new Point(-1, -1),
@@ -429,7 +430,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(1, 2) : new Point(-1, 2),
                     };
                 }
-                case Rotation.EAST -> {
+                case Direction.EAST -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(1, 0) : new Point(1, 0),
                             is_left_rotation ? new Point(1, 1) : new Point(1, 1),
@@ -437,7 +438,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(1, -2) : new Point(1, -2),
                     };
                 }
-                case Rotation.SOUTH -> {
+                case Direction.SOUTH -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(-1, 0) : new Point(1, 0),
                             is_left_rotation ? new Point(0, 0) : new Point(0, 0),
@@ -445,7 +446,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(-1, 2) : new Point(1, 2),
                     };
                 }
-                case Rotation.WEST -> {
+                case Direction.WEST -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(-1, 0) : new Point(-1, 0),
                             is_left_rotation ? new Point(-1, 1) : new Point(-1, 1),
@@ -454,8 +455,8 @@ public class FallingTetrimino {
                     };
                 }
             };
-            case L -> switch (rotation) {
-                case Rotation.NORTH -> {
+            case L -> switch (last_direction) {
+                case Direction.NORTH -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(1, 0) : new Point(-1, 0),
                             is_left_rotation ? new Point(1, -1) : new Point(-1, -1),
@@ -463,7 +464,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(1, 2) : new Point(-1, 2),
                     };
                 }
-                case Rotation.EAST -> {
+                case Direction.EAST -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(1, 0) : new Point(1, 0),
                             is_left_rotation ? new Point(1, 1) : new Point(1, 1),
@@ -471,7 +472,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(1, -2) : new Point(1, -2),
                     };
                 }
-                case Rotation.SOUTH -> {
+                case Direction.SOUTH -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(-1, 0) : new Point(1, 0),
                             is_left_rotation ? new Point(-1, -1) : new Point(1, -1),
@@ -479,7 +480,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(-1, 2) : new Point(1, 2),
                     };
                 }
-                case Rotation.WEST -> {
+                case Direction.WEST -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(-1, 0) : new Point(-1, 0),
                             is_left_rotation ? new Point(-1, 1) : new Point(-1, 1),
@@ -488,8 +489,8 @@ public class FallingTetrimino {
                     };
                 }
             };
-            case J -> switch (rotation) {
-                case Rotation.NORTH -> {
+            case J -> switch (last_direction) {
+                case Direction.NORTH -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(1, 0) : new Point(-1, 0),
                             is_left_rotation ? new Point(1, -1) : new Point(-1, -1),
@@ -497,7 +498,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(1, 2) : new Point(-1, 2),
                     };
                 }
-                case Rotation.EAST -> {
+                case Direction.EAST -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(1, 0) : new Point(1, 0),
                             is_left_rotation ? new Point(1, 1) : new Point(1, 1),
@@ -505,7 +506,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(1, -2) : new Point(1, -2),
                     };
                 }
-                case Rotation.SOUTH -> {
+                case Direction.SOUTH -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(-1, 0) : new Point(1, 0),
                             is_left_rotation ? new Point(-1, -1) : new Point(1, -1),
@@ -513,7 +514,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(-1, 2) : new Point(1, 2),
                     };
                 }
-                case Rotation.WEST -> {
+                case Direction.WEST -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(-1, 0) : new Point(-1, 0),
                             is_left_rotation ? new Point(-1, 1) : new Point(-1, 1),
@@ -522,8 +523,8 @@ public class FallingTetrimino {
                     };
                 }
             };
-            case S -> switch (rotation) {
-                case Rotation.NORTH -> {
+            case S -> switch (last_direction) {
+                case Direction.NORTH -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(1, 0) : new Point(-1, 0),
                             is_left_rotation ? new Point(1, -1) : new Point(-1, -1),
@@ -531,7 +532,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(1, 2) : new Point(-1, 2),
                     };
                 }
-                case Rotation.EAST -> {
+                case Direction.EAST -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(1, 0) : new Point(1, 0),
                             is_left_rotation ? new Point(1, 1) : new Point(1, 1),
@@ -539,7 +540,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(1, -2) : new Point(1, -2),
                     };
                 }
-                case Rotation.SOUTH -> {
+                case Direction.SOUTH -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(-1, 0) : new Point(1, 0),
                             is_left_rotation ? new Point(-1, -1) : new Point(1, -1),
@@ -547,7 +548,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(-1, 2) : new Point(1, 2),
                     };
                 }
-                case Rotation.WEST -> {
+                case Direction.WEST -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(-1, 0) : new Point(-1, 0),
                             is_left_rotation ? new Point(-1, 1) : new Point(-1, 1),
@@ -556,8 +557,8 @@ public class FallingTetrimino {
                     };
                 }
             };
-            case Z -> switch (rotation) {
-                case Rotation.NORTH -> {
+            case Z -> switch (last_direction) {
+                case Direction.NORTH -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(1, 0) : new Point(-1, 0),
                             is_left_rotation ? new Point(1, -1) : new Point(-1, -1),
@@ -565,7 +566,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(1, 2) : new Point(-1, 2),
                     };
                 }
-                case Rotation.EAST -> {
+                case Direction.EAST -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(1, 0) : new Point(1, 0),
                             is_left_rotation ? new Point(1, 1) : new Point(1, 1),
@@ -573,7 +574,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(1, -2) : new Point(1, -2),
                     };
                 }
-                case Rotation.SOUTH -> {
+                case Direction.SOUTH -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(-1, 0) : new Point(1, 0),
                             is_left_rotation ? new Point(-1, -1) : new Point(1, -1),
@@ -581,7 +582,7 @@ public class FallingTetrimino {
                             is_left_rotation ? new Point(-1, 2) : new Point(1, 2),
                     };
                 }
-                case Rotation.WEST -> {
+                case Direction.WEST -> {
                     yield new Point[] {
                             is_left_rotation ? new Point(-1, 0) : new Point(-1, 0),
                             is_left_rotation ? new Point(-1, 1) : new Point(-1, 1),
