@@ -1,6 +1,7 @@
 package Model.tetris;
 
 import game.Context;
+import game.GameMode;
 import game.GameState;
 import Model.minesweeper.Cell;
 import Model.minesweeper.Field;
@@ -12,16 +13,16 @@ public class FallingTetrimino {
     public static final int TETROMINO_SIZE = 4;
     public static final int SRS_POINTS_COUNT = 4;
 
-    TetriminoType type;
-    Direction direction = Direction.NORTH;
-    Point pos = new Point(Field.FIELD_X/2 - 1, -1);
-    Cell[] cells = new Cell[TETROMINO_SIZE];
-    Point[] cells_pos = new Point[TETROMINO_SIZE];
+    private TetriminoType type;
+    private Direction direction = Direction.NORTH;
+    private Point pos = new Point(Field.FIELD_X/2 - 1, -1);
+    private Cell[] cells = new Cell[TETROMINO_SIZE];
+    private Point[] cells_pos = new Point[TETROMINO_SIZE];
 
     public FallingTetrimino(Random rand) {
         type = TetriminoType.values()[rand.nextInt(TetriminoType.values().length)];
         for (int i = 0; i < TETROMINO_SIZE; i++) {
-            cells[i] = new Cell(type);
+            cells[i] = new Cell(type, rand);
         }
         cells_pos = setCellsPos();
     }
@@ -74,7 +75,10 @@ public class FallingTetrimino {
             }
             context.field.setCell(pos.x + cells_pos[i].x, pos.y + cells_pos[i].y, cells[i]);
         }
-        context.field.removeLines(context);
+        if (context.mode == GameMode.TETRIS)
+            context.field.removeLines(context);
+        if (context.mode == GameMode.TETRISWEEPER)
+            context.field.open(context);
     }
     public boolean moveLeft(Field field) {
         pos.x--;

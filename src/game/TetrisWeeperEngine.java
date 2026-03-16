@@ -71,14 +71,16 @@ public class TetrisWeeperEngine {
             @Override
             public void onCellLeftClick(int x, int y) {
                 if (context.state == GameState.RUN) {
-                    System.out.println("Левая кнопка " + x + " " + y + " нажата");
+                    //System.out.println("Левая кнопка " + x + " " + y + " нажата");
+                    context.field.open(context, x, y, true);
                     view.update(context);
                 }
             }
             @Override
             public void onCellRightClick(int x, int y) {
                 if (context.state == GameState.RUN) {
-                    System.out.println("Правая кнопка " + x + " " + y + " нажата");
+                    //System.out.println("Правая кнопка " + x + " " + y + " нажата");
+                    context.field.flag(context, x, y);
                     view.update(context);
                 }
             }
@@ -156,7 +158,7 @@ public class TetrisWeeperEngine {
             }
         });
 
-        game_timer = new Timer(1000, e -> {
+        game_timer = new Timer(2000, e -> {
             if (!context.tet.moveDown(context, MoveCause.GRAVITY)) nextTetrimino();
             view.update(context);
             if (context.state == GameState.LOOSE) game_timer.stop();

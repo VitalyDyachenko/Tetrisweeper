@@ -206,13 +206,13 @@ public class GameView {
         game_info_panel.setLayout(new BoxLayout(game_info_panel, BoxLayout.Y_AXIS));
 
         game_info_panel.add(mode_label);
-        game_info_panel.add(Box.createVerticalStrut(16));
+        game_info_panel.add(Box.createVerticalStrut(15));
         game_info_panel.add(next_panel);
-        game_info_panel.add(Box.createVerticalStrut(16));
+        game_info_panel.add(Box.createVerticalStrut(15));
         game_info_panel.add(srs_label);
         game_info_panel.add(Box.createVerticalStrut(10));
         game_info_panel.add(score_label);
-        game_info_panel.add(Box.createVerticalStrut(440));
+        game_info_panel.add(Box.createVerticalStrut(420));
         game_info_panel.add(restart_button);
         game_info_panel.add(Box.createVerticalStrut(10));
         game_info_panel.add(menu_button);
@@ -401,6 +401,7 @@ public class GameView {
             }
         });
 
+        input_map.put(KeyStroke.getKeyStroke("S"), "moveDown");
         input_map.put(KeyStroke.getKeyStroke("DOWN"), "moveDown");
         action_map.put("moveDown", new AbstractAction() {
             @Override
@@ -453,7 +454,7 @@ public class GameView {
 
     public void update(Context context) {
         if (context.state == GameState.RUN) {
-            field.update(context.field, context.tet);
+            field.update(context);
             next_tetrimino.setIcon(context.next_tet.getType().getIcon());
         }
 
