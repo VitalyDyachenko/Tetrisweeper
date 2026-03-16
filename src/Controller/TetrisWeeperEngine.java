@@ -56,6 +56,15 @@ public class TetrisWeeperEngine {
                     view.update(context);
                 }
             }
+            @Override
+            public void onHardDrop() {
+                if (context.state == GameState.RUN) {
+                    context.tet.hardDrop(context);
+                    nextTetrimino();
+                    view.update(context);
+                }
+                view.update(context);
+            }
 
 
 
@@ -134,7 +143,12 @@ public class TetrisWeeperEngine {
             }
             @Override
             public void onRecordAdd(String name) {
-                tetris_best.addScore(name, context.score);
+                if (context.mode == GameMode.TETRIS) {
+                    tetris_best.addScore(name, context.score);
+                }
+                else if (context.mode == GameMode.TETRISWEEPER) {
+                    tetrisweeper_best.addScore(name, context.score);
+                }
                 view.update(context);
                 updateScores();
             }

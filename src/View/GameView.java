@@ -52,6 +52,7 @@ public class GameView {
         void onSRSChanged(boolean enable);
         void onRecordAdd();
         void onRecordAdd(String name);
+        void onHardDrop();
     }
     private InputHandler input_handler;
     public void setInputHandler(InputHandler handler) {
@@ -111,7 +112,7 @@ public class GameView {
         stop_label.setFont(new Font("Arial", Font.BOLD, 48));
         //stop_label.setOpaque(true);
         //stop_label.setBackground(new Color(255, 255, 255, 10));
-        stop_label.setForeground(new Color(255, 255, 255, 150));
+        stop_label.setForeground(new Color(255, 255, 255, 220));
         stop_label.setBounds(0, 0,
                 Field.FIELD_X * FieldDrawer.SIZE,
                 Field.FIELD_Y * FieldDrawer.SIZE
@@ -127,8 +128,8 @@ public class GameView {
         });
         save_score_button.setFocusable(false);
         save_score_button.setMargin(new Insets(5, 30, 5, 30));
-        save_score_button.setBackground(new Color(52, 52, 52, 200));
-        save_score_button.setForeground(new Color(255, 255, 255, 200));
+        save_score_button.setBackground(new Color(52, 52, 52, 220));
+        save_score_button.setForeground(new Color(255, 255, 255, 220));
         save_score_button.setVisible(false);
         save_score_button.setBounds(
                 (Field.FIELD_X * FieldDrawer.SIZE - 200) / 2,
@@ -442,11 +443,19 @@ public class GameView {
             }
         });
 
-        input_map.put(KeyStroke.getKeyStroke("ENTER"), "switchStart");
-        action_map.put("switchStart", new AbstractAction() {
+        input_map.put(KeyStroke.getKeyStroke("ENTER"), "start");
+        action_map.put("start", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (input_handler != null) input_handler.onStart();
+            }
+        });
+
+        input_map.put(KeyStroke.getKeyStroke("SPACE"), "hardDrop");
+        action_map.put("hardDrop", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (input_handler != null) input_handler.onHardDrop();
             }
         });
     }

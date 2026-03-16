@@ -34,14 +34,15 @@ public class FallingTetrimino {
     public boolean haveCollisions(Field field) {
         Point[] points = getCellsPos();
         for (Point p : points) {
-            if (pos.y + p.y < 0) return true;
-            if (
-                    pos.y + p.y >= Field.FIELD_Y ||
-                    pos.x + p.x >= Field.FIELD_X ||
-                    pos.x + p.x < 0 ||
-                    field.getCell(pos.x + p.x, pos.y + p.y) != null
-            ) {
-                return true;
+            if (!(pos.y + p.y < 0 && pos.x + p.x < Field.FIELD_X && pos.x + p.x >= 0)) {
+                if (
+                        pos.y + p.y >= Field.FIELD_Y ||
+                                pos.x + p.x >= Field.FIELD_X ||
+                                pos.x + p.x < 0 ||
+                                field.getCell(pos.x + p.x, pos.y + p.y) != null
+                ) {
+                    return true;
+                }
             }
         }
         return false;
@@ -61,6 +62,9 @@ public class FallingTetrimino {
             context.score += 2;
         }
         return true;
+    }
+    public void hardDrop(Context context) {
+        while (moveDown(context, MoveCause.HARD_DROP));
     }
     private void setInField(Context context) {
         for (int i = 0; i < TETROMINO_SIZE; i++) {
