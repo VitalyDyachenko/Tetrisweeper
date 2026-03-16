@@ -1,6 +1,6 @@
 package Model.minesweeper;
 
-import Controller.Context;
+import game.Context;
 
 public class Field {
     public static final int FIELD_X = 10;

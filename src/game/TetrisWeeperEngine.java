@@ -1,10 +1,10 @@
-package Controller;
+package game;
 
-import Model.minesweeper.Field;
 import Model.tetris.FallingTetrimino;
 import Model.tetris.MoveCause;
 import View.GameView;
-import best_score.BestScoreTable;
+import View.InputHandler;
+import game.best_score.BestScoreTable;
 
 import javax.swing.Timer;
 import java.util.Random;
@@ -15,11 +15,11 @@ public class TetrisWeeperEngine {
     private GameView view = new GameView();
     private Timer game_timer;
     private static final Random RANDOM = new Random();
-    private BestScoreTable tetris_best = new BestScoreTable("src/best_score/tetris_best.properties");
-    private BestScoreTable tetrisweeper_best = new BestScoreTable("src/best_score/tetrisweeper_best.properties");
+    private BestScoreTable tetris_best = new BestScoreTable("src/game/best_score/tetris_best.properties");
+    private BestScoreTable tetrisweeper_best = new BestScoreTable("src/game/best_score/tetrisweeper_best.properties");
 
     public TetrisWeeperEngine() {
-        view.setInputHandler(new GameView.InputHandler() {
+        view.setInputHandler(new InputHandler() {
             @Override
             public void onLeft() {
                 if (context.state == GameState.RUN) {
@@ -89,6 +89,7 @@ public class TetrisWeeperEngine {
             public void onStart() {
                 if (context.state != GameState.RUN) {
                     context.field.clear();
+                    context.score = 0;
                     nextTetrimino();
                     nextTetrimino();
                     context.state = GameState.RUN;
@@ -99,6 +100,7 @@ public class TetrisWeeperEngine {
             @Override
             public void onRestart() {
                 context.field.clear();
+                context.score = 0;
                 nextTetrimino();
                 nextTetrimino();
                 context.state = GameState.RUN;

@@ -1,4 +1,4 @@
-package Controller;
+package game;
 
 import Model.minesweeper.Field;
 import Model.tetris.FallingTetrimino;

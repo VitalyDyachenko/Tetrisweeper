@@ -1,8 +1,8 @@
 package View;
 
-import Controller.Context;
-import Controller.GameMode;
-import Controller.GameState;
+import game.Context;
+import game.GameMode;
+import game.GameState;
 import Model.minesweeper.Field;
 import Model.tetris.TetriminoType;
 
@@ -35,26 +35,6 @@ public class GameView {
     private JTextArea record_list;
     private JPanel stop_panel;
 
-    public interface InputHandler {
-        void onLeft();
-        void onRight();
-        void onDown();
-        void onRotateLeft();
-        void onRotateRight();
-
-        void onCellLeftClick(int x, int y);
-        void onCellRightClick(int x, int y);
-
-        void onStart();
-        void onRestart();
-        void onMenu();
-        void onModeChanged(GameMode mode);
-        void onPause();
-        void onSRSChanged(boolean enable);
-        void onRecordAdd();
-        void onRecordAdd(String name);
-        void onHardDrop();
-    }
     private InputHandler input_handler;
     public void setInputHandler(InputHandler handler) {
         input_handler = handler;

@@ -1,4 +1,4 @@
-package best_score;
+package game.best_score;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -1,7 +1,7 @@
 package Model.tetris;
 
-import Controller.Context;
-import Controller.GameState;
+import game.Context;
+import game.GameState;
 import Model.minesweeper.Cell;
 import Model.minesweeper.Field;
 
