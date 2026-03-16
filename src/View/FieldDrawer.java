@@ -18,7 +18,7 @@ public class FieldDrawer {
 
     private JButton[][] buttons = new JButton[Field.FIELD_X][Field.FIELD_Y];
     private static final Border CELL_BORDER =
-            BorderFactory.createLineBorder(new Color(100, 150, 255), 2);
+            BorderFactory.createLineBorder(new Color(255, 255, 255), 2);
 
     public interface CellClickHandler {
         void onLeftClick(int x, int y);

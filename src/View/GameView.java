@@ -33,6 +33,7 @@ public class GameView {
     private JLabel next_tetrimino; // Картинка следющей фигуры
     private JButton save_score_button;
     private JTextArea record_list;
+    private JPanel stop_panel;
 
     public interface InputHandler {
         void onLeft();
@@ -138,12 +139,22 @@ public class GameView {
                 50
         );
 
+        stop_panel = new JPanel();
+        stop_panel.setBackground(new Color(5, 5, 5, 180));
+        stop_panel.setBounds(
+                0,
+                0,
+                Field.FIELD_X * FieldDrawer.SIZE,
+                Field.FIELD_Y * FieldDrawer.SIZE - 1
+        );
+
         // Панель игры
         game_panel = new JLayeredPane();
         game_panel.setPreferredSize(new Dimension(
                 Field.FIELD_X * FieldDrawer.SIZE,
                 Field.FIELD_Y * FieldDrawer.SIZE
         ));
+        game_panel.add(stop_panel, JLayeredPane.PALETTE_LAYER);
         game_panel.add(stop_label, JLayeredPane.POPUP_LAYER);
         game_panel.add(save_score_button, JLayeredPane.POPUP_LAYER);
         game_panel.add(field_panel, JLayeredPane.DEFAULT_LAYER);
@@ -478,15 +489,18 @@ public class GameView {
             if (context.state == GameState.LOOSE) {
                 stop_label.setText("GAME OVER");
                 stop_label.setVisible(true);
+                stop_panel.setVisible(true);
                 save_score_button.setVisible(true);
             }
             else if (context.state == GameState.PAUSE) {
                 stop_label.setText("PAUSE");
                 stop_label.setVisible(true);
+                stop_panel.setVisible(true);
                 save_score_button.setVisible(false);
             }
             else {
                 stop_label.setVisible(false);
+                stop_panel.setVisible(false);
                 save_score_button.setVisible(false);
             }
         }
