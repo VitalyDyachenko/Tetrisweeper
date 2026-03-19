@@ -63,7 +63,7 @@ public class FieldDrawer {
                 });
 
                 buttons[x][y][layer].addMouseListener(new MouseAdapter() {
-                    public void mouseClicked(MouseEvent e) {
+                    public void mousePressed(MouseEvent e) {
                         if (SwingUtilities.isLeftMouseButton(e)) {
                             cell_handler.onLeftClick(xi, yi);
                         } else if (SwingUtilities.isRightMouseButton(e)) {
