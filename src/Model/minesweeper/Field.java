@@ -9,10 +9,14 @@ public class Field {
 
     private Cell[][] field = new Cell[FIELD_X][FIELD_Y];
 
+    // Нужен для фикса проблемы с дырами в тетрис-сапёре
+    private boolean[][] holes = new boolean[FIELD_X][FIELD_Y];
+
     public void clear() {
         for (int y = 0; y < FIELD_Y; y++) {
             for (int x = 0; x < FIELD_X; x++) {
                 field[x][y] = null;
+                holes[x][y] = false;
             }
         }
     }
@@ -53,12 +57,36 @@ public class Field {
                 }
             }
         }
+        if (context.mode == GameMode.TETRISWEEPER) updateHoles();
+
         if (shift == 1) context.score += 100;
         else if (shift == 2) context.score += 300;
         else if (shift == 3) context.score += 500;
         else if (shift == 4) context.score += 800;
     }
-    public void open(Context context) {
+
+    public void updateHoles() {
+        for (int x = 0; x < FIELD_X; x++) {
+            for (int y = 0; y < FIELD_Y; y++) {
+                if (field[x][y] == null) holes[x][y] = true;
+            }
+        }
+        for (int x = 0; x < FIELD_X; x++) {
+            updateHoles(x, 0);
+        }
+    }
+    private void updateHoles(int x, int y) {
+        if (field[x][y] == null && holes[x][y]) {
+            holes[x][y] = false;
+            for (int X = Math.max(0, x - 1); X <= Math.min(FIELD_X - 1, x + 1); X++) {
+                for (int Y = Math.max(0, y - 1); Y <= Math.min(FIELD_Y - 1, y + 1); Y++) {
+                    if (X != x || Y != y) updateHoles(X, Y);
+                }
+            }
+        }
+    }
+
+    public void update(Context context) {
         for (int x = 0; x < FIELD_X; x++) {
             for (int y = 0; y < FIELD_Y; y++) {
                 if (field[x][y] != null) {
@@ -74,7 +102,7 @@ public class Field {
         if (x >= 0 && x < FIELD_X && y >= 0 && y < FIELD_Y &&
                 field[x][y] != null &&
                 !field[x][y].haveFlag() && !field[x][y].isOpened() &&
-                !isCellOnBorder(x, y)) {
+                (!isCellOnBorder(x, y) || isAboveTheHole(x, y))) {
             field[x][y].open();
             if (minesNextToMe(x, y) == 0) {
                 for (int X = Math.max(0, x - 1); X <= Math.min(FIELD_X - 1, x + 1); X++) {
@@ -82,14 +110,15 @@ public class Field {
                         if (X != x || Y != y) open(context, X, Y, false);
                     }
                 }
-                if (root) removeLines(context);
             }
+            if (root) removeLines(context);
         }
     }
+
     public void flag(Context context, int x, int y) {
         if (field[x][y] != null && !field[x][y].isOpened()) {
             field[x][y].changeFlag();
-            open(context);
+            update(context);
         }
     }
     public boolean isCellOnBorder(int X, int Y) {
@@ -108,5 +137,11 @@ public class Field {
             }
         }
         return n;
+    }
+    public boolean isAboveTheHole(int x, int y) {
+        return (x >= 0 && x < FIELD_X && y >= 0 && y < FIELD_Y - 1 &&
+                (field[x][y+1] == null && holes[x][y+1] ||
+                x-1 >= 0 && field[x-1][y+1] == null && holes[x-1][y+1] ||
+                x+1 < FIELD_X && field[x+1][y+1] == null && holes[x+1][y+1]));
     }
 }

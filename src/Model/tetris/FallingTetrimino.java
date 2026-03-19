@@ -75,10 +75,13 @@ public class FallingTetrimino {
             }
             context.field.setCell(pos.x + cells_pos[i].x, pos.y + cells_pos[i].y, cells[i]);
         }
-        if (context.mode == GameMode.TETRIS)
+
+        if (context.mode == GameMode.TETRIS) {
             context.field.removeLines(context);
-        if (context.mode == GameMode.TETRISWEEPER)
-            context.field.open(context);
+        }
+        else if (context.mode == GameMode.TETRISWEEPER) {
+            context.field.update(context);
+        }
     }
     public boolean moveLeft(Field field) {
         pos.x--;

@@ -100,7 +100,10 @@ public class FieldDrawer {
         Cell cell = context.field.getCell(x, y);
         if (cell == null) return CellTexture.EMPTY.getIcon();
         if (!cell.isOpened()) {
-            if (context.mode == GameMode.TETRISWEEPER && context.field.isCellOnBorder(x, y) && !cell.haveFlag())
+            if (context.mode == GameMode.TETRISWEEPER &&
+                    context.field.isCellOnBorder(x, y) &&
+                    !context.field.isAboveTheHole(x, y) &&
+                    !cell.haveFlag())
                 return switch (cell.getType()) {
                     case TetriminoType.T -> CellTexture.T_X.getIcon();
                     case TetriminoType.O -> CellTexture.O_X.getIcon();

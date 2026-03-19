@@ -5,7 +5,7 @@ import Model.tetris.TetriminoType;
 import java.util.Random;
 
 public class Cell {
-    public static final double MINE_CHANCE = 0.05;
+    public static final double MINE_CHANCE = 0.075;
 
     private TetriminoType type;
     private boolean have_mine = false;
