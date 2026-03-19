@@ -158,7 +158,7 @@ public class TetrisWeeperEngine {
             }
         });
 
-        game_timer = new Timer(2000, e -> {
+        game_timer = new Timer(1000, e -> {
             if (!context.tet.moveDown(context, MoveCause.GRAVITY)) nextTetrimino();
             view.update(context);
             if (context.state == GameState.LOOSE) game_timer.stop();

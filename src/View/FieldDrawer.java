@@ -18,9 +18,12 @@ public class FieldDrawer {
     public static final int FRAME_X = SIZE*(Field.FIELD_X + 6);
     public static final int FRAME_Y = SIZE*(Field.FIELD_Y) + 37;
 
-    private JButton[][] buttons = new JButton[Field.FIELD_X][Field.FIELD_Y];
+    private JButton[][][] buttons = new JButton[Field.FIELD_X][Field.FIELD_Y][2];
     private static final Border CELL_BORDER =
             BorderFactory.createLineBorder(new Color(255, 255, 255), 2);
+
+    private JPanel[] layers = new JPanel[2];
+    private int active_layer = 0;
 
     public interface CellClickHandler {
         void onLeftClick(int x, int y);
@@ -28,24 +31,38 @@ public class FieldDrawer {
     }
     private CellClickHandler cell_handler;
 
-    public FieldDrawer(JPanel game_panel, CellClickHandler handler) {
+    public FieldDrawer(JLayeredPane game_panel, CellClickHandler handler) {
         cell_handler = handler;
+
+        for (int layer = 0; layer < 2; layer++) {
+            layers[layer] = new JPanel(new GridLayout(Field.FIELD_Y, Field.FIELD_X, 0, 0));
+            layers[layer].setBounds(0, 0,
+                    Field.FIELD_X * SIZE,
+                    Field.FIELD_Y * SIZE);
+            layers[layer].setOpaque(false);
+
+            createButtons(layer);
+            game_panel.add(layers[layer], JLayeredPane.DEFAULT_LAYER);
+        }
+
+    }
+    private void createButtons(int layer) {
         for (int y = 0; y < Field.FIELD_Y; y++) {
             for (int x = 0; x < Field.FIELD_X; x++) {
                 int xi = x;
                 int yi = y;
-                buttons[x][y] = new JButton(CellTexture.EMPTY.getIcon());
-                buttons[x][y].setFocusable(false);
-                buttons[x][y].setContentAreaFilled(false);
-                buttons[xi][yi].setBorder(null);
-                buttons[x][y].setRequestFocusEnabled(false);
+                buttons[x][y][layer] = new JButton(CellTexture.EMPTY.getIcon());
+                buttons[x][y][layer].setFocusable(false);
+                buttons[x][y][layer].setContentAreaFilled(false);
+                buttons[xi][yi][layer].setBorder(null);
+                buttons[x][y][layer].setRequestFocusEnabled(false);
 
-                buttons[x][y].getModel().addChangeListener(e -> {
+                buttons[x][y][layer].getModel().addChangeListener(e -> {
                     ButtonModel model = (ButtonModel) e.getSource();
-                    buttons[xi][yi].setBorder(model.isRollover() ? CELL_BORDER : null);
+                    buttons[xi][yi][layer].setBorder(model.isRollover() ? CELL_BORDER : null);
                 });
 
-                buttons[x][y].addMouseListener(new MouseAdapter() {
+                buttons[x][y][layer].addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
                         if (SwingUtilities.isLeftMouseButton(e)) {
                             cell_handler.onLeftClick(xi, yi);
@@ -55,23 +72,28 @@ public class FieldDrawer {
                     }
                 });
 
-                game_panel.add(buttons[x][y]);
+                layers[layer].add(buttons[x][y][layer]);
             }
         }
     }
 
     public void update(Context context) {
+        int next_layer = (active_layer + 1) % 2;
         for (int x = 0; x < Field.FIELD_X; x++) {
             for (int y = 0; y < Field.FIELD_Y; y++) {
-                buttons[x][y].setIcon(getCellTexture(context, x, y));
+                buttons[x][y][next_layer].setIcon(getCellTexture(context, x, y));
             }
         }
         for (int i = 0; i < FallingTetrimino.TETROMINO_SIZE; i++) {
             Point p = context.tet.getCellsPos()[i];
             Cell c = context.tet.getCells()[i];
             if (p.y + context.tet.getPos().y >= 0)
-                buttons[p.x + context.tet.getPos().x][p.y + context.tet.getPos().y].setIcon(getTetCellTexture(c));
+                buttons[p.x + context.tet.getPos().x][p.y + context.tet.getPos().y][next_layer].setIcon(getTetCellTexture(c));
         }
+
+        layers[active_layer].setVisible(false);
+        layers[next_layer].setVisible(true);
+        active_layer = next_layer;
     }
 
     private ImageIcon getCellTexture(Context context, int x, int y) {

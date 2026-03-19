@@ -63,20 +63,21 @@ public class GameView {
 
     private void createGamePanel() {
         // Панель игрового поля
-        JPanel field_panel = new JPanel(new GridLayout(Field.FIELD_Y, Field.FIELD_X));
-        field_panel.setBackground(Color.BLACK);
-        field_panel.setPreferredSize(new Dimension(
-                Field.FIELD_X * FieldDrawer.SIZE,
-                Field.FIELD_Y * FieldDrawer.SIZE
-        ));
-        field_panel.setLayout(new GridLayout(Field.FIELD_Y, Field.FIELD_X));
-        field_panel.setBounds(0, 0,
-                Field.FIELD_X * FieldDrawer.SIZE,
-                Field.FIELD_Y * FieldDrawer.SIZE
-        );
+//        JPanel field_panel = new JPanel(new GridLayout(Field.FIELD_Y, Field.FIELD_X));
+//        field_panel.setBackground(Color.BLACK);
+//        field_panel.setPreferredSize(new Dimension(
+//                Field.FIELD_X * FieldDrawer.SIZE,
+//                Field.FIELD_Y * FieldDrawer.SIZE
+//        ));
+//        field_panel.setLayout(new GridLayout(Field.FIELD_Y, Field.FIELD_X));
+//        field_panel.setBounds(0, 0,
+//                Field.FIELD_X * FieldDrawer.SIZE,
+//                Field.FIELD_Y * FieldDrawer.SIZE
+//        );
+        game_panel = new JLayeredPane();
 
         // Поле с кнопками
-        field = new FieldDrawer(field_panel, new FieldDrawer.CellClickHandler() {
+        field = new FieldDrawer(game_panel, new FieldDrawer.CellClickHandler() {
             @Override
             public void onLeftClick(int x, int y) {
                 if (input_handler != null) input_handler.onCellLeftClick(x, y);
@@ -129,7 +130,6 @@ public class GameView {
         );
 
         // Панель игры
-        game_panel = new JLayeredPane();
         game_panel.setPreferredSize(new Dimension(
                 Field.FIELD_X * FieldDrawer.SIZE,
                 Field.FIELD_Y * FieldDrawer.SIZE
@@ -137,7 +137,6 @@ public class GameView {
         game_panel.add(stop_panel, JLayeredPane.PALETTE_LAYER);
         game_panel.add(stop_label, JLayeredPane.POPUP_LAYER);
         game_panel.add(save_score_button, JLayeredPane.POPUP_LAYER);
-        game_panel.add(field_panel, JLayeredPane.DEFAULT_LAYER);
 
         main_panel.add(game_panel, BorderLayout.WEST);
 
@@ -419,6 +418,7 @@ public class GameView {
         });
 
         input_map.put(KeyStroke.getKeyStroke("W"), "rotateRight");
+        input_map.put(KeyStroke.getKeyStroke("E"), "rotateRight");
         input_map.put(KeyStroke.getKeyStroke("UP"), "rotateRight");
         action_map.put("rotateRight", new AbstractAction() {
             @Override
