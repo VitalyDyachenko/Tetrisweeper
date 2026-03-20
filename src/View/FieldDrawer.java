@@ -119,6 +119,7 @@ public class FieldDrawer {
     private ImageIcon getCellTexture(Context context, int x, int y) {
         Cell cell = context.field.getCell(x, y);
         if (cell == null) return CellTexture.EMPTY.getIcon();
+        if (context.field.isLineResolved(y)) return CellTexture.RESOLVED.getIcon();
         if (!cell.isOpened()) {
             if (context.mode == GameMode.TETRISWEEPER &&
                     context.field.isCellOnBorder(x, y) &&

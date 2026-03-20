@@ -3,6 +3,6 @@ package game;
 public enum GameState {
     RUN,
     PAUSE,
-    LOOSE,
+    LOSE,
     MENU
 }

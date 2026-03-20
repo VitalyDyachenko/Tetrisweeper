@@ -4,6 +4,7 @@ import javax.swing.*;
 
 public enum CellTexture {
     EMPTY("empty"),
+    RESOLVED("resolved"),
     MINE("bomb"),
     N0("0"),
     N1("1"),

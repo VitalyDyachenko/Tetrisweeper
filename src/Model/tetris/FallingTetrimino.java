@@ -1,5 +1,6 @@
 package Model.tetris;
 
+import View.music.MusicType;
 import game.Context;
 import game.GameMode;
 import game.GameState;
@@ -76,18 +77,19 @@ public class FallingTetrimino {
         context.was_hold = false;
         for (int i = 0; i < TETROMINO_SIZE; i++) {
             if (pos.y + cells_pos[i].y < 0) {
-                context.state = GameState.LOOSE;
+                context.state = GameState.LOSE;
                 return;
             }
             context.field.setCell(pos.x + cells_pos[i].x, pos.y + cells_pos[i].y, cells[i]);
         }
 
         if (context.mode == GameMode.TETRIS) {
-            context.field.removeLines(context);
+            context.field.resolveLines(context);
         }
         else if (context.mode == GameMode.TETRISWEEPER) {
             context.field.update(context);
         }
+        context.sound_player.playMusic(MusicType.DROP);
     }
     public boolean moveLeft(Field field) {
         pos.x--;

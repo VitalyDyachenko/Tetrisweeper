@@ -1,5 +1,6 @@
 package Model.minesweeper;
 
+import View.music.MusicType;
 import game.Context;
 import game.GameMode;
 
@@ -12,12 +13,19 @@ public class Field {
     // Нужен для фикса проблемы с дырами в тетрис-сапёре
     private boolean[][] holes = new boolean[FIELD_X][FIELD_Y];
 
+    private boolean[] resolved_lines = new boolean[FIELD_Y];
+
+    public boolean isLineResolved(int y) {
+        return resolved_lines[y];
+    }
+
     public void clear() {
         for (int y = 0; y < FIELD_Y; y++) {
             for (int x = 0; x < FIELD_X; x++) {
                 field[x][y] = null;
                 holes[x][y] = false;
             }
+            resolved_lines[y] = false;
         }
     }
     public void setCell(int x, int y, Cell cell) {
@@ -26,6 +34,59 @@ public class Field {
     public Cell getCell(int x, int y) {
         return field[x][y];
     }
+
+    public void resolveLines(Context context) {
+        int shift = 0;
+        for (int y = 0; y < FIELD_Y; y++) {
+            boolean is_line = true;
+            for (int x = 0; x < FIELD_X; x++) {
+                if (context.mode == GameMode.TETRIS) {
+                    if (field[x][y] == null) {
+                        is_line = false;
+                        break;
+                    }
+                }
+                if (context.mode == GameMode.TETRISWEEPER) {
+                    if (field[x][y] == null || !field[x][y].isResolved()) {
+                        is_line = false;
+                        break;
+                    }
+                }
+            }
+            resolved_lines[y] = is_line;
+            if (is_line) shift++;
+        }
+        if (context.mode == GameMode.TETRIS) {
+            if (shift == 1) context.score += 100;
+            else if (shift == 2) context.score += 300;
+            else if (shift == 3) context.score += 500;
+            else if (shift == 4) context.score += 800;
+        }
+        else if (context.mode == GameMode.TETRISWEEPER) {
+            context.score += 200*shift;
+        }
+        //if (shift > 0) context.sound_player.playMusic(MusicType.LINE);
+    }
+    public void clearLines(Context context) {
+        int shift = 0;
+        for (int y = 0; y < FIELD_Y; y++) {
+            if (resolved_lines[y]) {
+                shift++;
+                for (int x = 0; x < FIELD_X; x++) field[x][y] = null;
+                for (int i = y; i >= shift; i--) {
+                    for (int x = 0; x < FIELD_X; x++) {
+                        field[x][i] = field[x][i-1];
+                    }
+                }
+                for (int x = 0; x < FIELD_X; x++) {
+                    field[x][0] = null;
+                }
+            }
+            resolved_lines[y] = false;
+        }
+        if (context.mode == GameMode.TETRISWEEPER) updateHoles();
+    }
+    /*
     public void removeLines(Context context) {
         int shift = 0;
         for (int y = 0; y < FIELD_Y; y++) {
@@ -64,6 +125,7 @@ public class Field {
         else if (shift == 3) context.score += 500;
         else if (shift == 4) context.score += 800;
     }
+    */
 
     public void updateHoles() {
         for (int x = 0; x < FIELD_X; x++) {
@@ -113,7 +175,7 @@ public class Field {
                     }
                 }
             }
-            if (root) removeLines(context);
+            if (root) resolveLines(context);
         }
         return false;
     }

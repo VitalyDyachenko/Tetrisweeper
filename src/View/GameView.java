@@ -47,6 +47,8 @@ public class GameView {
         game_frame.setResizable(false);
         game_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         game_frame.setLocation(500, 10);
+        ImageIcon icon = new ImageIcon("resources/icon.png");
+        game_frame.setIconImage(icon.getImage());
 
         main_panel = new JPanel(new BorderLayout());
         main_panel.setBackground(Color.GRAY);
@@ -489,7 +491,7 @@ public class GameView {
             menu_panel.setVisible(false);
             game_info_panel.setVisible(true);
             game_panel.setVisible(true);
-            if (context.state == GameState.LOOSE) {
+            if (context.state == GameState.LOSE) {
                 stop_label.setText("GAME OVER");
                 stop_label.setVisible(true);
                 stop_panel.setVisible(true);

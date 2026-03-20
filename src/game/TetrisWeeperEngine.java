@@ -4,6 +4,8 @@ import Model.tetris.FallingTetrimino;
 import Model.tetris.MoveCause;
 import View.GameView;
 import View.InputHandler;
+import View.music.MusicPlayer;
+import View.music.MusicType;
 import game.best_score.BestScoreTable;
 
 import javax.swing.Timer;
@@ -26,6 +28,7 @@ public class TetrisWeeperEngine {
                     context.tet.moveLeft(context.field);
                     view.update(context);
                 }
+                //context.sound_player.playMusic(MusicType.MOVE);
             }
             @Override
             public void onRight() {
@@ -33,6 +36,7 @@ public class TetrisWeeperEngine {
                     context.tet.moveRight(context.field);
                     view.update(context);
                 }
+                //context.sound_player.playMusic(MusicType.MOVE);
             }
             @Override
             public void onDown() {
@@ -48,6 +52,7 @@ public class TetrisWeeperEngine {
                     context.tet.rotateLeft(context);
                     view.update(context);
                 }
+                //context.sound_player.playMusic(MusicType.ROTATE);
             }
             @Override
             public void onRotateRight() {
@@ -55,6 +60,7 @@ public class TetrisWeeperEngine {
                     context.tet.rotateRight(context);
                     view.update(context);
                 }
+                //context.sound_player.playMusic(MusicType.ROTATE);
             }
             @Override
             public void onHardDrop() {
@@ -89,7 +95,11 @@ public class TetrisWeeperEngine {
                     //System.out.println("Левая кнопка " + x + " " + y + " нажата");
                     if (context.field.open(context, x, y, true)) {
                         view.update(context);
-                        context.state = GameState.LOOSE;
+                        context.state = GameState.LOSE;
+                        context.sound_player.playMusic(MusicType.BOMB);
+                    }
+                    else {
+                        context.sound_player.playMusic(MusicType.CLICK);
                     }
                     view.update(context);
                 }
@@ -99,6 +109,7 @@ public class TetrisWeeperEngine {
                 if (context.state == GameState.RUN) {
                     //System.out.println("Правая кнопка " + x + " " + y + " нажата");
                     context.field.flag(context, x, y);
+                    context.sound_player.playMusic(MusicType.FLAG);
                     view.update(context);
                 }
             }
@@ -116,6 +127,7 @@ public class TetrisWeeperEngine {
                     context.state = GameState.RUN;
                     view.update(context);
                     game_timer.start();
+                    context.music_player.playMusic(MusicType.GAME);
                 }
             }
             @Override
@@ -128,22 +140,26 @@ public class TetrisWeeperEngine {
                 context.state = GameState.RUN;
                 view.update(context);
                 game_timer.start();
+                context.music_player.playMusic(MusicType.GAME);
             }
             @Override
             public void onMenu() {
                 context.state = GameState.MENU;
                 view.update(context);
                 game_timer.stop();
+                context.music_player.playMusic(MusicType.MENU);
             }
             @Override
             public void onPause() {
                 if (context.state == GameState.PAUSE) {
                     context.state = GameState.RUN;
                     game_timer.start();
+                    context.music_player.continueMusic();
                 }
                 else if (context.state == GameState.RUN) {
                     context.state = GameState.PAUSE;
                     game_timer.stop();
+                    context.music_player.stopMusic();
                 }
                 view.update(context);
             }
@@ -178,13 +194,19 @@ public class TetrisWeeperEngine {
             }
         });
 
-        game_timer = new Timer(2000, e -> {
+        game_timer = new Timer(1000, e -> {
+            context.field.clearLines(context);
             if (!context.tet.moveDown(context, MoveCause.GRAVITY)) nextTetrimino();
             view.update(context);
-            if (context.state == GameState.LOOSE) game_timer.stop();
+            if (context.state == GameState.LOSE) {
+                game_timer.stop();
+                if (!context.sound_player.isPlaying()) context.sound_player.playMusic(MusicType.LOSE);
+                context.music_player.stopMusic();
+            }
         });
 
         updateScores();
+        context.music_player.playMusic(MusicType.MENU);
     }
 
     private void nextTetrimino() {
