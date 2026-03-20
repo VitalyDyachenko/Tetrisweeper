@@ -9,6 +9,7 @@ public class Context {
     public GameState state = GameState.MENU;
     public int score = 0;
     public boolean super_rotation_system = true;
+    public int level = 1;
 
     public Field field = new Field();
     public FallingTetrimino tet;
@@ -16,6 +17,5 @@ public class Context {
     public boolean was_hold = false;
     public FallingTetrimino next_tet;
 
-    public MusicPlayer music_player = new MusicPlayer(true);
-    public MusicPlayer sound_player = new MusicPlayer(false);
+    public MusicPlayer music_player = new MusicPlayer();
 }

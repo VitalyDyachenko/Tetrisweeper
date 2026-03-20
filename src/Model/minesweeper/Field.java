@@ -65,7 +65,7 @@ public class Field {
         else if (context.mode == GameMode.TETRISWEEPER) {
             context.score += 200*shift;
         }
-        //if (shift > 0) context.sound_player.playMusic(MusicType.LINE);
+        if (shift > 0) context.music_player.playSound(MusicType.LINE);
     }
     public void clearLines(Context context) {
         int shift = 0;
@@ -85,6 +85,7 @@ public class Field {
             resolved_lines[y] = false;
         }
         if (context.mode == GameMode.TETRISWEEPER) updateHoles();
+        if (shift > 0) update(context);
     }
     /*
     public void removeLines(Context context) {
@@ -162,10 +163,7 @@ public class Field {
         if (context.mode == GameMode.TETRISWEEPER) updateHoles();
     }
     public boolean open(Context context, int x, int y, boolean root) {
-        if (x >= 0 && x < FIELD_X && y >= 0 && y < FIELD_Y &&
-                field[x][y] != null &&
-                !field[x][y].haveFlag() && !field[x][y].isOpened() &&
-                (!isCellOnBorder(x, y) || isAboveTheHole(x, y))) {
+        if (canOpen(x, y)) {
             field[x][y].open();
             if (field[x][y].haveMine()) return true;
             if (minesNextToMe(x, y) == 0) {
@@ -178,6 +176,12 @@ public class Field {
             if (root) resolveLines(context);
         }
         return false;
+    }
+    public boolean canOpen(int x, int y) {
+        return x >= 0 && x < FIELD_X && y >= 0 && y < FIELD_Y &&
+                field[x][y] != null &&
+                !field[x][y].haveFlag() && !field[x][y].isOpened() &&
+                (!isCellOnBorder(x, y) || isAboveTheHole(x, y));
     }
 
     public void flag(Context context, int x, int y) {

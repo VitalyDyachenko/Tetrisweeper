@@ -89,7 +89,7 @@ public class FallingTetrimino {
         else if (context.mode == GameMode.TETRISWEEPER) {
             context.field.update(context);
         }
-        context.sound_player.playMusic(MusicType.DROP);
+        context.music_player.playSound(MusicType.DROP);
     }
     public boolean moveLeft(Field field) {
         pos.x--;

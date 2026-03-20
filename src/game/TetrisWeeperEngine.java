@@ -28,7 +28,7 @@ public class TetrisWeeperEngine {
                     context.tet.moveLeft(context.field);
                     view.update(context);
                 }
-                //context.sound_player.playMusic(MusicType.MOVE);
+                context.music_player.playSound(MusicType.MOVE);
             }
             @Override
             public void onRight() {
@@ -36,7 +36,7 @@ public class TetrisWeeperEngine {
                     context.tet.moveRight(context.field);
                     view.update(context);
                 }
-                //context.sound_player.playMusic(MusicType.MOVE);
+                context.music_player.playSound(MusicType.MOVE);
             }
             @Override
             public void onDown() {
@@ -52,7 +52,7 @@ public class TetrisWeeperEngine {
                     context.tet.rotateLeft(context);
                     view.update(context);
                 }
-                //context.sound_player.playMusic(MusicType.ROTATE);
+                context.music_player.playSound(MusicType.ROTATE);
             }
             @Override
             public void onRotateRight() {
@@ -60,7 +60,7 @@ public class TetrisWeeperEngine {
                     context.tet.rotateRight(context);
                     view.update(context);
                 }
-                //context.sound_player.playMusic(MusicType.ROTATE);
+                context.music_player.playSound(MusicType.ROTATE);
             }
             @Override
             public void onHardDrop() {
@@ -93,13 +93,11 @@ public class TetrisWeeperEngine {
             public void onCellLeftClick(int x, int y) {
                 if (context.state == GameState.RUN) {
                     //System.out.println("Левая кнопка " + x + " " + y + " нажата");
+                    if (context.field.canOpen(x, y)) context.music_player.playSound(MusicType.CLICK);
                     if (context.field.open(context, x, y, true)) {
                         view.update(context);
                         context.state = GameState.LOSE;
-                        context.sound_player.playMusic(MusicType.BOMB);
-                    }
-                    else {
-                        context.sound_player.playMusic(MusicType.CLICK);
+                        context.music_player.playSound(MusicType.BOMB);
                     }
                     view.update(context);
                 }
@@ -109,7 +107,7 @@ public class TetrisWeeperEngine {
                 if (context.state == GameState.RUN) {
                     //System.out.println("Правая кнопка " + x + " " + y + " нажата");
                     context.field.flag(context, x, y);
-                    context.sound_player.playMusic(MusicType.FLAG);
+                    context.music_player.playSound(MusicType.FLAG);
                     view.update(context);
                 }
             }
@@ -200,7 +198,7 @@ public class TetrisWeeperEngine {
             view.update(context);
             if (context.state == GameState.LOSE) {
                 game_timer.stop();
-                if (!context.sound_player.isPlaying()) context.sound_player.playMusic(MusicType.LOSE);
+                context.music_player.playSound(MusicType.LOSE);
                 context.music_player.stopMusic();
             }
         });
