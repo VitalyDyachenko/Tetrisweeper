@@ -12,8 +12,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
@@ -33,6 +31,7 @@ public class GameView {
     private JLabel score_label;
     private JLabel srs_label;
     private JLabel next_tetrimino; // Картинка следющей фигуры
+    private JLabel hold_tetrimino; // Картинка удержанной фигуры
     private JButton save_score_button;
     private JTextArea record_list;
     private JPanel stop_panel;
@@ -64,18 +63,6 @@ public class GameView {
     }
 
     private void createGamePanel() {
-        // Панель игрового поля
-//        JPanel field_panel = new JPanel(new GridLayout(Field.FIELD_Y, Field.FIELD_X));
-//        field_panel.setBackground(Color.BLACK);
-//        field_panel.setPreferredSize(new Dimension(
-//                Field.FIELD_X * FieldDrawer.SIZE,
-//                Field.FIELD_Y * FieldDrawer.SIZE
-//        ));
-//        field_panel.setLayout(new GridLayout(Field.FIELD_Y, Field.FIELD_X));
-//        field_panel.setBounds(0, 0,
-//                Field.FIELD_X * FieldDrawer.SIZE,
-//                Field.FIELD_Y * FieldDrawer.SIZE
-//        );
         game_panel = new JLayeredPane();
 
         // Поле с кнопками
@@ -176,6 +163,22 @@ public class GameView {
         next_panel.add(next_label, BorderLayout.NORTH);
         next_panel.add(next_tetrimino, BorderLayout.CENTER);
 
+        // Панель с удержанной фигурой
+        JLabel hold_label = new JLabel(" HOLD:");
+        hold_label.setFont(new Font("Arial", Font.BOLD, 18));
+        hold_label.setForeground(MENU_TEXT_COLOR);
+        hold_label.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        hold_tetrimino = new JLabel(TetriminoType.T.getIcon());
+
+        JPanel hold_panel = new JPanel(new BorderLayout());
+        hold_panel.setBackground(new Color(40, 40, 40));
+        //hold_panel.setPreferredSize(new Dimension(FieldDrawer.SIZE*4 + 4, FieldDrawer.SIZE*4 + 4));
+        hold_panel.setMaximumSize(new Dimension(FieldDrawer.SIZE*4 + 4, FieldDrawer.SIZE*4 + 4));
+        hold_panel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        hold_panel.add(hold_label, BorderLayout.NORTH);
+        hold_panel.add(hold_tetrimino, BorderLayout.CENTER);
+
         // Кнопка рестарта
         JButton restart_button = new JButton("RESTART");
         restart_button.setFont(new Font("Arial", Font.BOLD, 16));
@@ -210,10 +213,12 @@ public class GameView {
         game_info_panel.add(Box.createVerticalStrut(15));
         game_info_panel.add(next_panel);
         game_info_panel.add(Box.createVerticalStrut(15));
+        game_info_panel.add(hold_panel);
+        game_info_panel.add(Box.createVerticalStrut(15));
         game_info_panel.add(srs_label);
         game_info_panel.add(Box.createVerticalStrut(10));
         game_info_panel.add(score_label);
-        game_info_panel.add(Box.createVerticalStrut(420));
+        game_info_panel.add(Box.createVerticalStrut(260));
         game_info_panel.add(restart_button);
         game_info_panel.add(Box.createVerticalStrut(10));
         game_info_panel.add(menu_button);
@@ -452,6 +457,14 @@ public class GameView {
                 if (input_handler != null) input_handler.onHardDrop();
             }
         });
+
+        input_map.put(KeyStroke.getKeyStroke("C"), "hold");
+        action_map.put("hold", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (input_handler != null) input_handler.onHold();
+            }
+        });
     }
 
     public void update(Context context) {
@@ -459,6 +472,12 @@ public class GameView {
         if (context.state == GameState.RUN) {
             field.update(context);
             next_tetrimino.setIcon(context.next_tet.getType().getIcon());
+            if (context.hold_tet == null) {
+                hold_tetrimino.setIcon(null);
+            }
+            else {
+                hold_tetrimino.setIcon(context.hold_tet.getType().getIcon());
+            }
         }
 
         if (context.state == GameState.MENU) {

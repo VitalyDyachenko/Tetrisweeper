@@ -11,5 +11,7 @@ public class Context {
 
     public Field field = new Field();
     public FallingTetrimino tet;
+    public FallingTetrimino hold_tet;
+    public boolean was_hold = false;
     public FallingTetrimino next_tet;
 }

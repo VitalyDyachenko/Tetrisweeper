@@ -8,6 +8,7 @@ public interface InputHandler {
     void onDown();
     void onRotateLeft();
     void onRotateRight();
+    void onHold();
 
     void onCellLeftClick(int x, int y);
     void onCellRightClick(int x, int y);

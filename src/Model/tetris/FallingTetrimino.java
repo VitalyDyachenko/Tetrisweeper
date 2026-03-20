@@ -32,6 +32,11 @@ public class FallingTetrimino {
     public Point getPos() { return pos; }
     public TetriminoType getType() { return type; }
 
+    public void setToStart() {
+        pos.x = Field.FIELD_X/2 - 1;
+        pos.y = -1;
+    }
+
     public boolean haveCollisions(Field field) {
         Point[] points = getCellsPos();
         for (Point p : points) {
@@ -68,6 +73,7 @@ public class FallingTetrimino {
         while (moveDown(context, MoveCause.HARD_DROP));
     }
     private void setInField(Context context) {
+        context.was_hold = false;
         for (int i = 0; i < TETROMINO_SIZE; i++) {
             if (pos.y + cells_pos[i].y < 0) {
                 context.state = GameState.LOOSE;

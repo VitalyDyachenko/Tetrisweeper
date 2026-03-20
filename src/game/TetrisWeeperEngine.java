@@ -65,6 +65,21 @@ public class TetrisWeeperEngine {
                 }
                 view.update(context);
             }
+            @Override
+            public void onHold() {
+                if (!context.was_hold) {
+                    FallingTetrimino t = context.hold_tet;
+                    context.hold_tet = context.tet;
+                    if (t == null) {
+                        nextTetrimino();
+                    } else {
+                        context.tet = t;
+                        context.tet.setToStart();
+                    }
+                    context.was_hold = true;
+                    view.update(context);
+                }
+            }
 
 
 
@@ -95,6 +110,7 @@ public class TetrisWeeperEngine {
                 if (context.state != GameState.RUN) {
                     context.field.clear();
                     context.score = 0;
+                    context.hold_tet = null;
                     nextTetrimino();
                     nextTetrimino();
                     context.state = GameState.RUN;
@@ -106,6 +122,7 @@ public class TetrisWeeperEngine {
             public void onRestart() {
                 context.field.clear();
                 context.score = 0;
+                context.hold_tet = null;
                 nextTetrimino();
                 nextTetrimino();
                 context.state = GameState.RUN;
