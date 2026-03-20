@@ -6,6 +6,7 @@ import Model.tetris.FallingTetrimino;
 import Model.tetris.TetriminoType;
 import game.Context;
 import game.GameMode;
+import game.GameState;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -35,7 +36,7 @@ public class FieldDrawer {
         cell_handler = handler;
 
         for (int layer = 0; layer < 2; layer++) {
-            layers[layer] = new JPanel(new GridLayout(Field.FIELD_Y, Field.FIELD_X, 0, 0));
+            layers[layer] = new JPanel(new GridLayout(Field.FIELD_Y, Field.FIELD_X, 0, 0) );
             layers[layer].setBounds(0, 0,
                     Field.FIELD_X * SIZE,
                     Field.FIELD_Y * SIZE);
@@ -51,7 +52,15 @@ public class FieldDrawer {
             for (int x = 0; x < Field.FIELD_X; x++) {
                 int xi = x;
                 int yi = y;
-                buttons[x][y][layer] = new JButton(CellTexture.EMPTY.getIcon());
+                buttons[x][y][layer] = new JButton(CellTexture.EMPTY.getIcon()) {
+                    @Override
+                    public void setEnabled(boolean enabled) {
+                        Icon currentIcon = getIcon();
+                        super.setEnabled(enabled);
+                        setIcon(currentIcon);
+                        setDisabledIcon(currentIcon);
+                    }
+                };
                 buttons[x][y][layer].setFocusable(false);
                 buttons[x][y][layer].setContentAreaFilled(false);
                 buttons[xi][yi][layer].setBorder(null);
@@ -82,6 +91,7 @@ public class FieldDrawer {
         for (int x = 0; x < Field.FIELD_X; x++) {
             for (int y = 0; y < Field.FIELD_Y; y++) {
                 buttons[x][y][next_layer].setIcon(getCellTexture(context, x, y));
+                buttons[x][y][next_layer].setDisabledIcon(getCellTexture(context, x, y));
             }
         }
         for (int i = 0; i < FallingTetrimino.TETROMINO_SIZE; i++) {
@@ -94,6 +104,16 @@ public class FieldDrawer {
         layers[active_layer].setVisible(false);
         layers[next_layer].setVisible(true);
         active_layer = next_layer;
+    }
+
+    public void setButtonsEnabled(boolean enabled) {
+        for (int layer = 0; layer < 2; layer++) {
+            for (int x = 0; x < Field.FIELD_X; x++) {
+                for (int y = 0; y < Field.FIELD_Y; y++) {
+                    buttons[x][y][layer].setEnabled(enabled);
+                }
+            }
+        }
     }
 
     private ImageIcon getCellTexture(Context context, int x, int y) {

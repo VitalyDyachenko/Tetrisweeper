@@ -12,6 +12,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
@@ -453,6 +455,7 @@ public class GameView {
     }
 
     public void update(Context context) {
+        field.setButtonsEnabled(context.state == GameState.RUN);
         if (context.state == GameState.RUN) {
             field.update(context);
             next_tetrimino.setIcon(context.next_tet.getType().getIcon());

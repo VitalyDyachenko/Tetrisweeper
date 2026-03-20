@@ -97,13 +97,15 @@ public class Field {
                 }
             }
         }
+        if (context.mode == GameMode.TETRISWEEPER) updateHoles();
     }
-    public void open(Context context, int x, int y, boolean root) {
+    public boolean open(Context context, int x, int y, boolean root) {
         if (x >= 0 && x < FIELD_X && y >= 0 && y < FIELD_Y &&
                 field[x][y] != null &&
                 !field[x][y].haveFlag() && !field[x][y].isOpened() &&
                 (!isCellOnBorder(x, y) || isAboveTheHole(x, y))) {
             field[x][y].open();
+            if (field[x][y].haveMine()) return true;
             if (minesNextToMe(x, y) == 0) {
                 for (int X = Math.max(0, x - 1); X <= Math.min(FIELD_X - 1, x + 1); X++) {
                     for (int Y = Math.max(0, y - 1); Y <= Math.min(FIELD_Y - 1, y + 1); Y++) {
@@ -113,6 +115,7 @@ public class Field {
             }
             if (root) removeLines(context);
         }
+        return false;
     }
 
     public void flag(Context context, int x, int y) {
