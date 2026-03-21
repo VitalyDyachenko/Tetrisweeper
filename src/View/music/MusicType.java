@@ -11,6 +11,7 @@ public enum MusicType {
     ROTATE("Rotate"),
     MOVE("Move"),
     DROP("Drop"),
+    LVLUP("Lvl up"),
 
     MENU("Menu"),
     GAME("Game");
@@ -19,6 +20,6 @@ public enum MusicType {
     public File getFile() {return file;}
 
     MusicType(String filename) {
-        this.file = new File("resources/" + filename + ".wav");
+        this.file = new File("resources/sounds/" + filename + ".wav");
     }
 }

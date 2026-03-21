@@ -16,7 +16,9 @@ public class TetrisWeeperEngine {
     private Context context = new Context();
 
     private GameView view = new GameView();
-    private Timer game_timer;
+    private Timer game_timer = new Timer(1000, e -> {
+        gameLoop();
+    });;
     private static final Random RANDOM = new Random();
     private BestScoreTable tetris_best = new BestScoreTable("src/game/best_score/tetris_best.properties");
     private BestScoreTable tetrisweeper_best = new BestScoreTable("src/game/best_score/tetrisweeper_best.properties");
@@ -25,6 +27,43 @@ public class TetrisWeeperEngine {
     private int lvl_goal = 5; // Сколько надо очистить линий до следующего lvl
 
     public TetrisWeeperEngine() {
+        setInputHandlerActions();
+
+        updateScores();
+        music_player.playMusic(MusicType.MENU);
+    }
+
+    private void gameLoop() {
+        context.field.clearLines(context);
+        moveTetrimino(MoveCause.GRAVITY);
+        view.update(context);
+        if (context.state == GameState.LOSE) {
+            game_timer.stop();
+            music_player.playSound(MusicType.LOSE);
+            music_player.stopMusic();
+        }
+        updateLVL();
+    }
+
+    private void startGame() {
+        lvl_goal = 5;
+        context.field.clear();
+        context.score = 0;
+        context.lines_cleared = 0;
+        context.level = 1;
+        context.hold_tet = null;
+        context.was_hold = false;
+        nextTetrimino();
+        nextTetrimino();
+        context.state = GameState.RUN;
+
+        view.update(context);
+        music_player.playMusic(MusicType.GAME);
+
+        game_timer.setDelay(speed());
+        game_timer.start();
+    }
+    void setInputHandlerActions() {
         view.setInputHandler(new InputHandler() {
             @Override
             public void onLeft() {
@@ -98,8 +137,7 @@ public class TetrisWeeperEngine {
 
             @Override
             public void onCellLeftClick(int x, int y) {
-                if (context.state == GameState.RUN) {
-                    //System.out.println("Левая кнопка " + x + " " + y + " нажата");
+                if (context.state == GameState.RUN && context.mode == GameMode.TETRISWEEPER) {
                     if (context.field.canOpen(x, y)) music_player.playSound(MusicType.CLICK);
                     Field.OpenResult res = context.field.openByPlayer(context, x, y);
                     if (res.mine_opened) {
@@ -115,8 +153,7 @@ public class TetrisWeeperEngine {
             }
             @Override
             public void onCellRightClick(int x, int y) {
-                if (context.state == GameState.RUN) {
-                    //System.out.println("Правая кнопка " + x + " " + y + " нажата");
+                if (context.state == GameState.RUN && context.mode == GameMode.TETRISWEEPER) {
                     boolean was_lines_cleared = context.field.flag(context, x, y);
                     if (was_lines_cleared) music_player.playSound(MusicType.LINE);
                     music_player.playSound(MusicType.FLAG);
@@ -129,36 +166,12 @@ public class TetrisWeeperEngine {
             @Override
             public void onStart() {
                 if (context.state != GameState.RUN) {
-                    context.field.clear();
-                    lvl_goal = 5;
-                    context.score = 0;
-                    context.lines_cleared = 0;
-                    context.level = 1;
-                    context.hold_tet = null;
-                    context.was_hold = false;
-                    nextTetrimino();
-                    nextTetrimino();
-                    context.state = GameState.RUN;
-                    view.update(context);
-                    game_timer.start();
-                    music_player.playMusic(MusicType.GAME);
+                    startGame();
                 }
             }
             @Override
             public void onRestart() {
-                context.field.clear();
-                context.score = 0;
-                lvl_goal = 5;
-                context.lines_cleared = 0;
-                context.level = 1;
-                context.hold_tet = null;
-                context.was_hold = false;
-                nextTetrimino();
-                nextTetrimino();
-                context.state = GameState.RUN;
-                view.update(context);
-                game_timer.start();
-                music_player.playMusic(MusicType.GAME);
+                startGame();
             }
             @Override
             public void onMenu() {
@@ -216,26 +229,21 @@ public class TetrisWeeperEngine {
                 music_player.setVolume(volume);
             }
         });
-
-        game_timer = new Timer(1000, e -> {
-            context.field.clearLines(context);
-            moveTetrimino(MoveCause.GRAVITY);
-            view.update(context);
-            if (context.state == GameState.LOSE) {
-                game_timer.stop();
-                music_player.playSound(MusicType.LOSE);
-                music_player.stopMusic();
-            }
-            updateLVL();
-        });
-
-        updateScores();
-        music_player.playMusic(MusicType.MENU);
     }
 
     private void nextTetrimino() {
         context.tet = context.next_tet;
         context.next_tet = new FallingTetrimino(RANDOM);
+    }
+    private void moveTetrimino(MoveCause cause) {
+        FallingTetrimino.MoveResult res = context.tet.moveDown(context, cause);
+        if (res.landed) {
+            nextTetrimino();
+            music_player.playSound(MusicType.DROP);
+            if (res.was_lines_cleared) {
+                music_player.playSound(MusicType.LINE);
+            }
+        }
     }
 
     private void updateScores() {
@@ -251,6 +259,7 @@ public class TetrisWeeperEngine {
                 lvl_goal += context.level * 5;
                 context.level++;
                 game_timer.setDelay(speed());
+                music_player.playSound(MusicType.LVLUP);
             }
         }
     }
@@ -262,7 +271,7 @@ public class TetrisWeeperEngine {
             case 4 -> 473;
             case 5 -> 355;
             case 6 -> 262;
-            case 7 -> 19;
+            case 7 -> 190;
             case 8 -> 135;
             case 9 -> 94;
             case 10 -> 64;
@@ -277,14 +286,4 @@ public class TetrisWeeperEngine {
         return speed;
     }
 
-    private void moveTetrimino(MoveCause cause) {
-        FallingTetrimino.MoveResult res = context.tet.moveDown(context, cause);
-        if (res.landed) {
-            nextTetrimino();
-            music_player.playSound(MusicType.DROP);
-            if (res.was_lines_cleared) {
-                music_player.playSound(MusicType.LINE);
-            }
-        }
-    }
 }

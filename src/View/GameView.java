@@ -53,8 +53,7 @@ public class GameView {
         game_frame.setResizable(false);
         game_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         game_frame.setLocation(500, 10);
-        ImageIcon icon = new ImageIcon("resources/icon.png");
-        game_frame.setIconImage(icon.getImage());
+        game_frame.setIconImage(CellTexture.T_FLAG.getIcon().getImage());
 
         main_panel = new JPanel(new BorderLayout());
         main_panel.setBackground(Color.GRAY);
@@ -174,7 +173,7 @@ public class GameView {
         next_tetrimino = new JLabel(TetriminoType.T.getIcon());
 
         JPanel next_panel = new JPanel(new BorderLayout());
-        next_panel.setBackground(new Color(40, 40, 40));
+        next_panel.setBackground(MENU_COLOR);
         next_panel.setPreferredSize(new Dimension(FieldDrawer.SIZE*4 + 4, FieldDrawer.SIZE*4 + 4));
         next_panel.setMaximumSize(new Dimension(FieldDrawer.SIZE*4 + 4, FieldDrawer.SIZE*4 + 4));
         next_panel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -190,7 +189,7 @@ public class GameView {
         hold_tetrimino = new JLabel(TetriminoType.T.getIcon());
 
         JPanel hold_panel = new JPanel(new BorderLayout());
-        hold_panel.setBackground(new Color(40, 40, 40));
+        hold_panel.setBackground(MENU_COLOR);
         //hold_panel.setPreferredSize(new Dimension(FieldDrawer.SIZE*4 + 4, FieldDrawer.SIZE*4 + 4));
         hold_panel.setMaximumSize(new Dimension(FieldDrawer.SIZE*4 + 4, FieldDrawer.SIZE*4 + 4));
         hold_panel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -234,7 +233,7 @@ public class GameView {
         game_info_panel.add(hold_panel);
         game_info_panel.add(Box.createVerticalStrut(15));
         game_info_panel.add(score_label);
-        game_info_panel.add(Box.createVerticalStrut(10));
+        game_info_panel.add(Box.createVerticalStrut(5));
         game_info_panel.add(lvl_label);
         game_info_panel.add(Box.createVerticalStrut(20));
         game_info_panel.add(srs_label);
@@ -249,13 +248,13 @@ public class GameView {
     }
     private void createMenuPanel() {
         // Заголовок
-        JLabel title = new JLabel("TETRISWEEPER");
-        title.setForeground(Color.WHITE);
-        title.setFont(new Font("Arial", Font.BOLD, 32));
+        JLabel title = new JLabel(new ImageIcon("resources/UI/Title.png"));
+        //title.setForeground(Color.WHITE);
+        //title.setFont(new Font("Arial", Font.BOLD, 32));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        Icon normal_icon = new ImageIcon("resources/RadioButton icon 1.png");
-        Icon selected_icon = new ImageIcon("resources/RadioButton icon 2.png");
+        Icon normal_icon = new ImageIcon("resources/UI/RadioButton icon 1.png");
+        Icon selected_icon = new ImageIcon("resources/UI/RadioButton icon 2.png");
 
         // Кнопка режима Тетрис:
         JPanel tetris_mode_panel = new JPanel(new BorderLayout());
@@ -327,10 +326,10 @@ public class GameView {
         srs_checkbox.setFont(new Font("Arial", Font.BOLD, 20));
 
         // Переключатель громкости
-        Icon volume_icon0 = new ImageIcon("resources/Volume0.png");
-        Icon volume_icon1 = new ImageIcon("resources/Volume1.png");
-        Icon volume_icon2 = new ImageIcon("resources/Volume2.png");
-        Icon volume_icon3 = new ImageIcon("resources/Volume3.png");
+        Icon volume_icon0 = new ImageIcon("resources/UI/Volume0.png");
+        Icon volume_icon1 = new ImageIcon("resources/UI/Volume1.png");
+        Icon volume_icon2 = new ImageIcon("resources/UI/Volume2.png");
+        Icon volume_icon3 = new ImageIcon("resources/UI/Volume3.png");
         volume_panel = new JLabel(volume_icon2);
         volume_panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         volume_panel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -445,16 +444,16 @@ public class GameView {
         menu_panel.setBackground(MENU_COLOR);
         menu_panel.setLayout(new BoxLayout(menu_panel, BoxLayout.Y_AXIS));
 
-        menu_panel.add(Box.createVerticalStrut(50));
+        menu_panel.add(Box.createVerticalStrut(10));
         menu_panel.add(title);
-        menu_panel.add(Box.createVerticalStrut(40));
+        menu_panel.add(Box.createVerticalStrut(20));
         menu_panel.add(mode_panel);
         menu_panel.add(Box.createVerticalStrut(20));
         menu_panel.add(record_panel_title);
         menu_panel.add(record_panel);
         menu_panel.add(Box.createVerticalStrut(20));
         menu_panel.add(srs_checkbox);
-        menu_panel.add(Box.createVerticalStrut(100));
+        menu_panel.add(Box.createVerticalStrut(20));
         menu_panel.add(volume_panel); // Место под volume_panel
         menu_panel.add(Box.createVerticalStrut(20));
         menu_panel.add(start_button);
@@ -607,6 +606,7 @@ public class GameView {
 
     public void addRecordWindow() {
         JFrame record_window = new JFrame("Save score");
+        record_window.setIconImage(CellTexture.MINE.getIcon().getImage());
 
         JTextField text_field = new JTextField();
         text_field.setColumns(24);
@@ -635,7 +635,7 @@ public class GameView {
         record_window.setSize(300, 100);
         record_window.setResizable(false);
         record_window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        record_window.setLocation(540, 300);
+        record_window.setLocation(521, 440);
         record_window.setVisible(true);
         record_window.add(panel);
     }
