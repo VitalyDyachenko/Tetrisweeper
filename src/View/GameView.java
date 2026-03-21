@@ -220,7 +220,7 @@ public class GameView {
         game_info_panel.add(srs_label);
         game_info_panel.add(Box.createVerticalStrut(10));
         game_info_panel.add(score_label);
-        game_info_panel.add(Box.createVerticalStrut(260));
+        game_info_panel.add(Box.createVerticalStrut(160));
         game_info_panel.add(restart_button);
         game_info_panel.add(Box.createVerticalStrut(10));
         game_info_panel.add(menu_button);

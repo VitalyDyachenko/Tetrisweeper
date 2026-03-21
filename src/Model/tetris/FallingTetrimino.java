@@ -1,6 +1,5 @@
 package Model.tetris;
 
-import View.music.MusicType;
 import game.Context;
 import game.GameMode;
 import game.GameState;
@@ -54,13 +53,21 @@ public class FallingTetrimino {
         }
         return false;
     }
+    public static class MoveResult {
+        public boolean landed;
+        public boolean was_lines_cleared;
 
-    public boolean moveDown(Context context, MoveCause cause) {
+        public MoveResult(boolean landed, boolean lines) {
+            this.landed = landed;
+            this.was_lines_cleared = lines;
+        }
+    }
+    public MoveResult moveDown(Context context, MoveCause cause) {
         pos.y++;
         if (haveCollisions(context.field)) {
             pos.y--;
-            setInField(context);
-            return false;
+            boolean was_lines_cleared = setInField(context);
+            return new MoveResult(true, was_lines_cleared);
         }
         if (cause == MoveCause.SOFT_DROP) {
             context.score++;
@@ -68,29 +75,35 @@ public class FallingTetrimino {
         if (cause == MoveCause.HARD_DROP) {
             context.score += 2;
         }
-        return true;
+        return new MoveResult(false, false);
     }
-    public void hardDrop(Context context) {
-        while (moveDown(context, MoveCause.HARD_DROP));
+    public boolean hardDrop(Context context) {
+        MoveResult res;
+        do {
+            res = moveDown(context, MoveCause.HARD_DROP);
+        }
+        while (!res.landed);
+        return res.was_lines_cleared;
     }
-    private void setInField(Context context) {
+    private boolean setInField(Context context) {
         context.was_hold = false;
         for (int i = 0; i < TETROMINO_SIZE; i++) {
             if (pos.y + cells_pos[i].y < 0) {
                 context.state = GameState.LOSE;
-                return;
+                return false;
             }
             context.field.setCell(pos.x + cells_pos[i].x, pos.y + cells_pos[i].y, cells[i]);
         }
-
+        boolean was_lines_deleted = false;
         if (context.mode == GameMode.TETRIS) {
-            context.field.resolveLines(context);
+            was_lines_deleted = context.field.resolveLines(context);
         }
         else if (context.mode == GameMode.TETRISWEEPER) {
-            context.field.update(context);
+            was_lines_deleted = context.field.update(context);
         }
-        context.music_player.playSound(MusicType.DROP);
+        return was_lines_deleted;
     }
+
     public boolean moveLeft(Field field) {
         pos.x--;
         if (haveCollisions(field)) {
@@ -403,7 +416,6 @@ public class FallingTetrimino {
             };
         };
     }
-
     public Point[] getSuperRotationSystemShifts(Direction last_direction, boolean is_left_rotation) {
         return switch (type) {
             case I -> switch (last_direction) {

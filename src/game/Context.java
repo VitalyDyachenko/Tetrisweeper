@@ -16,6 +16,4 @@ public class Context {
     public FallingTetrimino hold_tet;
     public boolean was_hold = false;
     public FallingTetrimino next_tet;
-
-    public MusicPlayer music_player = new MusicPlayer();
 }

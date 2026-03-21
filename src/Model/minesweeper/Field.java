@@ -1,6 +1,5 @@
 package Model.minesweeper;
 
-import View.music.MusicType;
 import game.Context;
 import game.GameMode;
 
@@ -14,10 +13,6 @@ public class Field {
     private boolean[][] holes = new boolean[FIELD_X][FIELD_Y];
 
     private boolean[] resolved_lines = new boolean[FIELD_Y];
-
-    public boolean isLineResolved(int y) {
-        return resolved_lines[y];
-    }
 
     public void clear() {
         for (int y = 0; y < FIELD_Y; y++) {
@@ -35,7 +30,10 @@ public class Field {
         return field[x][y];
     }
 
-    public void resolveLines(Context context) {
+    public boolean isLineResolved(int y) {
+        return resolved_lines[y];
+    }
+    public boolean resolveLines(Context context) {
         int shift = 0;
         for (int y = 0; y < FIELD_Y; y++) {
             boolean is_line = true;
@@ -65,7 +63,7 @@ public class Field {
         else if (context.mode == GameMode.TETRISWEEPER) {
             context.score += 200*shift;
         }
-        if (shift > 0) context.music_player.playSound(MusicType.LINE);
+        return (shift > 0);
     }
     public void clearLines(Context context) {
         int shift = 0;
@@ -84,88 +82,42 @@ public class Field {
             }
             resolved_lines[y] = false;
         }
-        if (context.mode == GameMode.TETRISWEEPER) updateHoles();
-        if (shift > 0) update(context);
-    }
-    /*
-    public void removeLines(Context context) {
-        int shift = 0;
-        for (int y = 0; y < FIELD_Y; y++) {
-            boolean is_line = true;
-            for (int x = 0; x < FIELD_X; x++) {
-                if (context.mode == GameMode.TETRIS) {
-                    if (field[x][y] == null) {
-                        is_line = false;
-                        break;
-                    }
-                }
-                if (context.mode == GameMode.TETRISWEEPER) {
-                    if (field[x][y] == null || !field[x][y].isResolved()) {
-                        is_line = false;
-                        break;
-                    }
-                }
-            }
-            if (is_line) {
-                shift++;
-                for (int x = 0; x < FIELD_X; x++) field[x][y] = null;
-                for (int i = y; i >= shift; i--) {
-                    for (int x = 0; x < FIELD_X; x++) {
-                        field[x][i] = field[x][i-1];
-                    }
-                }
-                for (int x = 0; x < FIELD_X; x++) {
-                    field[x][0] = null;
-                }
-            }
-        }
-        if (context.mode == GameMode.TETRISWEEPER) updateHoles();
-
-        if (shift == 1) context.score += 100;
-        else if (shift == 2) context.score += 300;
-        else if (shift == 3) context.score += 500;
-        else if (shift == 4) context.score += 800;
-    }
-    */
-
-    public void updateHoles() {
-        for (int x = 0; x < FIELD_X; x++) {
-            for (int y = 0; y < FIELD_Y; y++) {
-                if (field[x][y] == null) holes[x][y] = true;
-            }
-        }
-        for (int x = 0; x < FIELD_X; x++) {
-            updateHoles(x, 0);
-        }
-    }
-    private void updateHoles(int x, int y) {
-        if (field[x][y] == null && holes[x][y]) {
-            holes[x][y] = false;
-            for (int X = Math.max(0, x - 1); X <= Math.min(FIELD_X - 1, x + 1); X++) {
-                for (int Y = Math.max(0, y - 1); Y <= Math.min(FIELD_Y - 1, y + 1); Y++) {
-                    if (X != x || Y != y) updateHoles(X, Y);
-                }
-            }
-        }
+        update(context);
     }
 
-    public void update(Context context) {
+    public static class OpenResult {
+        public boolean mine_opened;
+        public boolean was_lines_cleared;
+
+        public OpenResult(boolean mine_opened, boolean lines) {
+            this.mine_opened = mine_opened;
+            this.was_lines_cleared = lines;
+        }
+    }
+    public OpenResult openByPlayer(Context context, int x, int y) {
+        boolean was_lines_cleared = open(context, x, y, true);
+        return new OpenResult(field[x][y].haveMine(), was_lines_cleared);
+    }
+    public boolean update(Context context) {
+        updateHoles(context);
+        boolean was_lines_cleared = false;
         for (int x = 0; x < FIELD_X; x++) {
             for (int y = 0; y < FIELD_Y; y++) {
                 if (field[x][y] != null) {
                     if (field[x][y].isOpened()) {
                         field[x][y].close();
-                        open(context, x, y, true);
+                        was_lines_cleared = was_lines_cleared || open(context, x, y, true);
                     }
                 }
             }
         }
-        if (context.mode == GameMode.TETRISWEEPER) updateHoles();
+        return was_lines_cleared;
     }
-    public boolean open(Context context, int x, int y, boolean root) {
+    private boolean open(Context context, int x, int y, boolean root) {
+        boolean was_lines_cleared = false;
         if (canOpen(x, y)) {
             field[x][y].open();
-            if (field[x][y].haveMine()) return true;
+            if (field[x][y].haveMine()) return false;
             if (minesNextToMe(x, y) == 0) {
                 for (int X = Math.max(0, x - 1); X <= Math.min(FIELD_X - 1, x + 1); X++) {
                     for (int Y = Math.max(0, y - 1); Y <= Math.min(FIELD_Y - 1, y + 1); Y++) {
@@ -173,9 +125,9 @@ public class Field {
                     }
                 }
             }
-            if (root) resolveLines(context);
+            if (root) was_lines_cleared = resolveLines(context);
         }
-        return false;
+        return was_lines_cleared;
     }
     public boolean canOpen(int x, int y) {
         return x >= 0 && x < FIELD_X && y >= 0 && y < FIELD_Y &&
@@ -184,12 +136,14 @@ public class Field {
                 (!isCellOnBorder(x, y) || isAboveTheHole(x, y));
     }
 
-    public void flag(Context context, int x, int y) {
+    public boolean flag(Context context, int x, int y) {
         if (field[x][y] != null && !field[x][y].isOpened()) {
             field[x][y].changeFlag();
-            update(context);
+            return update(context);
         }
+        return false;
     }
+
     public boolean isCellOnBorder(int X, int Y) {
         for (int x = Math.max(0, X - 1); x <= Math.min(FIELD_X - 1, X + 1); x++) {
             for (int y = Math.max(0, Y - 1); y <= Math.min(FIELD_Y - 1, Y + 1); y++) {
@@ -207,10 +161,33 @@ public class Field {
         }
         return n;
     }
+
+    public void updateHoles(Context context) {
+        if (context.mode == GameMode.TETRISWEEPER) {
+            for (int x = 0; x < FIELD_X; x++) {
+                for (int y = 0; y < FIELD_Y; y++) {
+                    if (field[x][y] == null) holes[x][y] = true;
+                }
+            }
+            for (int x = 0; x < FIELD_X; x++) {
+                updateHoles(x, 0);
+            }
+        }
+    }
+    private void updateHoles(int x, int y) {
+        if (field[x][y] == null && holes[x][y]) {
+            holes[x][y] = false;
+            for (int X = Math.max(0, x - 1); X <= Math.min(FIELD_X - 1, x + 1); X++) {
+                for (int Y = Math.max(0, y - 1); Y <= Math.min(FIELD_Y - 1, y + 1); Y++) {
+                    if (X != x || Y != y) updateHoles(X, Y);
+                }
+            }
+        }
+    }
     public boolean isAboveTheHole(int x, int y) {
         return (x >= 0 && x < FIELD_X && y >= 0 && y < FIELD_Y - 1 &&
                 (field[x][y+1] == null && holes[x][y+1] ||
-                x-1 >= 0 && field[x-1][y+1] == null && holes[x-1][y+1] ||
-                x+1 < FIELD_X && field[x+1][y+1] == null && holes[x+1][y+1]));
+                        x-1 >= 0 && field[x-1][y+1] == null && holes[x-1][y+1] ||
+                        x+1 < FIELD_X && field[x+1][y+1] == null && holes[x+1][y+1]));
     }
 }
