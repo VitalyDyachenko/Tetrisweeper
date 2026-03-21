@@ -531,58 +531,54 @@ public class GameView {
         });
     }
 
+
     public void update(Context context) {
         field.setButtonsEnabled(context.state == GameState.RUN);
-        if (context.state == GameState.RUN) {
-            field.update(context);
-            next_tetrimino.setIcon(context.next_tet.getType().getIcon());
-            if (context.hold_tet == null) {
-                hold_tetrimino.setIcon(null);
-            }
-            else {
-                hold_tetrimino.setIcon(context.hold_tet.getType().getIcon());
-            }
-        }
+        if (context.state == GameState.RUN) field.update(context);
 
+        if (context.hold_tet == null) hold_tetrimino.setIcon(null);
+        else hold_tetrimino.setIcon(context.hold_tet.getType().getIcon());
+
+        if (context.next_tet != null) next_tetrimino.setIcon(context.next_tet.getType().getIcon());
+
+        stop_label.setText(context.state == GameState.LOSE ? "GAME OVER" : "PAUSE");
+        mode_label.setText(context.mode.toString());
+        score_label.setText("SCORE: " + context.score);
+        srs_label.setText("SRS: " + (context.super_rotation_system ? "ON" : "OFF"));
+
+        setVolumeLabel(context);
+
+        updateMenuVisions(context);
+    }
+    private void setVolumeLabel(Context context) {
         if (context.state == GameState.MENU) {
             if (volume_panel.getParent() != menu_panel) {
                 game_info_panel.remove(volume_panel);
                 menu_panel.add(volume_panel, 10);
             }
-            menu_panel.setVisible(true);
-            game_info_panel.setVisible(false);
-            game_panel.setVisible(false);
         }
         else {
             if (volume_panel.getParent() != game_info_panel) {
                 menu_panel.remove(volume_panel);
                 game_info_panel.add(volume_panel, 10);
             }
-            menu_panel.setVisible(false);
-            game_info_panel.setVisible(true);
-            game_panel.setVisible(true);
-            if (context.state == GameState.LOSE) {
-                stop_label.setText("GAME OVER");
-                stop_label.setVisible(true);
-                stop_panel.setVisible(true);
-                save_score_button.setVisible(true);
-            }
-            else if (context.state == GameState.PAUSE) {
-                stop_label.setText("PAUSE");
-                stop_label.setVisible(true);
-                stop_panel.setVisible(true);
-                save_score_button.setVisible(false);
-            }
-            else {
-                stop_label.setVisible(false);
-                stop_panel.setVisible(false);
-                save_score_button.setVisible(false);
-            }
         }
-
-        mode_label.setText(context.mode.toString());
-        score_label.setText("SCORE: " + context.score);
-        srs_label.setText("SRS: " + (context.super_rotation_system ? "ON" : "OFF"));
+    }
+    private void updateMenuVisions(Context context) {
+        menu_panel.setVisible(context.state == GameState.MENU);
+        game_info_panel.setVisible(
+                        context.state == GameState.RUN ||
+                        context.state == GameState.LOSE ||
+                        context.state == GameState.PAUSE
+        );
+        game_panel.setVisible(
+                        context.state == GameState.RUN ||
+                        context.state == GameState.LOSE ||
+                        context.state == GameState.PAUSE
+        );
+        stop_label.setVisible(context.state == GameState.LOSE || context.state == GameState.PAUSE);
+        stop_panel.setVisible(context.state == GameState.LOSE || context.state == GameState.PAUSE);
+        save_score_button.setVisible(context.state == GameState.LOSE);
     }
     public void updateScores(List<Map.Entry<String, Integer>> scores) {
         StringBuilder sb = new StringBuilder();
@@ -594,6 +590,7 @@ public class GameView {
 
         record_list.setText(sb.toString());
     }
+
     public void addRecordWindow() {
         JFrame record_window = new JFrame("Save score");
 
@@ -604,15 +601,17 @@ public class GameView {
             public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
                 if (str == null) return;
 
-                // Проверяем, не превысит ли лимит
                 if ((getLength() + str.length()) <= 24) {
                     super.insertString(offs, str, a);
                 }
             }
         });
         text_field.addActionListener(e -> {
-            if (input_handler != null) input_handler.onRecordAdd(text_field.getText());
-            record_window.dispose();
+            String text = text_field.getText();
+            if (text.length() != 0) {
+                if (input_handler != null) input_handler.onRecordAdd(text);
+                record_window.dispose();
+            }
         });
 
         JPanel panel = new JPanel(new FlowLayout());
