@@ -108,6 +108,7 @@ public class Field {
                     if (field[x][y].isOpened()) {
                         field[x][y].close();
                         was_lines_cleared = was_lines_cleared || open(context, x, y, true);
+                        field[x][y].open();
                     }
                 }
             }

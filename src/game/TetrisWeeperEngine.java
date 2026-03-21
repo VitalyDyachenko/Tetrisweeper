@@ -282,7 +282,7 @@ public class TetrisWeeperEngine {
             case 15 -> 7;
             default -> 10000;
         };
-        if (context.mode == GameMode.TETRISWEEPER) speed *= 2;
+        if (context.mode == GameMode.TETRISWEEPER) speed = (int)(1.5*speed);
         return speed;
     }
 
