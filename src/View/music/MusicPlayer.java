@@ -6,9 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MusicPlayer {
+    public static final float DEFAULT_VOLUME = 0.7f;
+
     private Clip background_music;
     private Map<MusicType, Clip> sounds = new HashMap<>();
-    private float volume = 0.7f;
+    private float volume = DEFAULT_VOLUME;
 
     private Clip getClip(MusicType type) {
         if (sounds.containsKey(type)) {
@@ -27,6 +29,11 @@ public class MusicPlayer {
         }
     }
 
+    public void setVolume(float new_v) {
+        volume = new_v;
+        changeVolume(background_music);
+    }
+
     public boolean isPlaying() {
         return background_music != null && background_music.isRunning();
     }
@@ -42,7 +49,7 @@ public class MusicPlayer {
                 clip.setFramePosition(0);
                 background_music = clip;
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
-                setVolume(clip);
+                changeVolume(clip);
                 clip.start();
             }
         } catch (Exception e) {
@@ -55,7 +62,7 @@ public class MusicPlayer {
             Clip clip = getClip(type);
             if (clip != null) {
                 clip.setFramePosition(0);
-                setVolume(clip);
+                changeVolume(clip);
                 clip.start();
             }
         } catch (Exception e) {
@@ -75,7 +82,7 @@ public class MusicPlayer {
         }
     }
 
-    public void setVolume(Clip clip) {
+    public void changeVolume(Clip clip) {
         if (clip != null && clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
             FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
             float range = gainControl.getMaximum() - gainControl.getMinimum();

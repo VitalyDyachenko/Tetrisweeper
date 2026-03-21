@@ -12,8 +12,11 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.*;
 import java.util.List;
+
+import static View.music.MusicPlayer.DEFAULT_VOLUME;
 
 public class GameView {
     private static final Color MENU_COLOR = new Color(49, 49, 49);
@@ -35,6 +38,7 @@ public class GameView {
     private JButton save_score_button;
     private JTextArea record_list;
     private JPanel stop_panel;
+    JLabel volume_panel;
 
     private InputHandler input_handler;
     public void setInputHandler(InputHandler handler) {
@@ -207,8 +211,8 @@ public class GameView {
 
         // Вся боковая панель
         game_info_panel = new JPanel();
-        game_info_panel.setBackground(Color.LIGHT_GRAY);
-        game_info_panel.setPreferredSize(new Dimension(160, Field.FIELD_Y * FieldDrawer.SIZE));
+        game_info_panel.setBackground(new Color(192, 192, 192));
+        game_info_panel.setPreferredSize(new Dimension(168, Field.FIELD_Y * FieldDrawer.SIZE));
         game_info_panel.setLayout(new BoxLayout(game_info_panel, BoxLayout.Y_AXIS));
 
         game_info_panel.add(mode_label);
@@ -220,6 +224,8 @@ public class GameView {
         game_info_panel.add(srs_label);
         game_info_panel.add(Box.createVerticalStrut(10));
         game_info_panel.add(score_label);
+        game_info_panel.add(Box.createVerticalStrut(10));
+        //                                <- Место под volume_label
         game_info_panel.add(Box.createVerticalStrut(160));
         game_info_panel.add(restart_button);
         game_info_panel.add(Box.createVerticalStrut(10));
@@ -306,6 +312,59 @@ public class GameView {
         //srs_checkbox.setFocusPainted(false);
         srs_checkbox.setFont(new Font("Arial", Font.BOLD, 20));
 
+        // Переключатель громкости
+        Icon volume_icon0 = new ImageIcon("resources/Volume0.png");
+        Icon volume_icon1 = new ImageIcon("resources/Volume1.png");
+        Icon volume_icon2 = new ImageIcon("resources/Volume2.png");
+        Icon volume_icon3 = new ImageIcon("resources/Volume3.png");
+        volume_panel = new JLabel(volume_icon2);
+        volume_panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        volume_panel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JSlider volume_slider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int)(DEFAULT_VOLUME*100));
+        volume_slider.setFocusable(false);
+        volume_slider.setMaximumSize(new Dimension(118, 30));
+        volume_slider.setPreferredSize(new Dimension(118, 30));
+        volume_slider.setPaintLabels(false);
+        volume_slider.setPaintTicks(false);
+        volume_slider.setMajorTickSpacing(5);
+        volume_slider.setMinorTickSpacing(5);
+        volume_slider.setSnapToTicks(true);
+        volume_slider.setOpaque(false);
+        volume_slider.addChangeListener(e -> {
+            float volume = volume_slider.getValue() / 100f;
+            if (volume == 0)
+                volume_panel.setIcon(volume_icon0);
+            else if (volume <= 0.33f)
+                volume_panel.setIcon(volume_icon1);
+            else if (volume <= 0.66f)
+                volume_panel.setIcon(volume_icon2);
+            else
+                volume_panel.setIcon(volume_icon3);
+            if (input_handler != null) input_handler.onVolumeChanged(volume);
+        });
+        volume_slider.setUI(new javax.swing.plaf.basic.BasicSliderUI(volume_slider) {
+            @Override
+            public void paintTrack(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(new Color(86, 86, 86));
+                g2.fillRect(trackRect.x, trackRect.y + trackRect.height/2 - 2, trackRect.width, 4);
+
+                int fillWidth = (int)(trackRect.width * (volume_slider.getValue() / 100.0));
+                g2.setColor(new Color(192, 192, 192));
+                g2.fillRect(trackRect.x, trackRect.y + trackRect.height/2 - 2, fillWidth, 4);
+            }
+
+            @Override
+            public void paintThumb(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(new Color(192, 192, 192));
+                g2.fillRect(thumbRect.x, thumbRect.y, thumbRect.width, thumbRect.height);
+            }
+        });
+        volume_panel.add(volume_slider);
+
+
         // Таблица рекордов
         record_list = new JTextArea();
         record_list.setEditable(false);
@@ -381,7 +440,10 @@ public class GameView {
         menu_panel.add(record_panel);
         menu_panel.add(Box.createVerticalStrut(20));
         menu_panel.add(srs_checkbox);
-        menu_panel.add(Box.createVerticalStrut(200));
+        menu_panel.add(Box.createVerticalStrut(20));
+        menu_panel.add(volume_panel);
+        //menu_panel.add(volume_slider);
+        menu_panel.add(Box.createVerticalStrut(100));
         menu_panel.add(start_button);
 
         main_panel.add(menu_panel, BorderLayout.CENTER);
@@ -483,11 +545,19 @@ public class GameView {
         }
 
         if (context.state == GameState.MENU) {
+            if (volume_panel.getParent() != menu_panel) {
+                game_info_panel.remove(volume_panel);
+                menu_panel.add(volume_panel, 10);
+            }
             menu_panel.setVisible(true);
             game_info_panel.setVisible(false);
             game_panel.setVisible(false);
         }
         else {
+            if (volume_panel.getParent() != game_info_panel) {
+                menu_panel.remove(volume_panel);
+                game_info_panel.add(volume_panel, 10);
+            }
             menu_panel.setVisible(false);
             game_info_panel.setVisible(true);
             game_panel.setVisible(true);

@@ -9,6 +9,7 @@ public interface InputHandler {
     void onRotateLeft();
     void onRotateRight();
     void onHold();
+    void onHardDrop();
 
     void onCellLeftClick(int x, int y);
     void onCellRightClick(int x, int y);
@@ -21,5 +22,5 @@ public interface InputHandler {
     void onSRSChanged(boolean enable);
     void onRecordAdd();
     void onRecordAdd(String name);
-    void onHardDrop();
+    void onVolumeChanged(float volume);
 }

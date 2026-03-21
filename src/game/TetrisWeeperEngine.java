@@ -130,6 +130,7 @@ public class TetrisWeeperEngine {
                     context.field.clear();
                     context.score = 0;
                     context.hold_tet = null;
+                    context.was_hold = false;
                     nextTetrimino();
                     nextTetrimino();
                     context.state = GameState.RUN;
@@ -143,6 +144,7 @@ public class TetrisWeeperEngine {
                 context.field.clear();
                 context.score = 0;
                 context.hold_tet = null;
+                context.was_hold = false;
                 nextTetrimino();
                 nextTetrimino();
                 context.state = GameState.RUN;
@@ -199,6 +201,11 @@ public class TetrisWeeperEngine {
                 }
                 view.update(context);
                 updateScores();
+            }
+
+            @Override
+            public void onVolumeChanged(float volume) {
+                music_player.setVolume(volume);
             }
         });
 
