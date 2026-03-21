@@ -228,6 +228,11 @@ public class TetrisWeeperEngine {
             public void onVolumeChanged(float volume) {
                 music_player.setVolume(volume);
             }
+
+            @Override
+            public void onHelp() {
+                view.addHelpWindow();
+            }
         });
     }
 

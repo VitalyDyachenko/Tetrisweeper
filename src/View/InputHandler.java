@@ -23,4 +23,5 @@ public interface InputHandler {
     void onRecordAdd();
     void onRecordAdd(String name);
     void onVolumeChanged(float volume);
+    void onHelp();
 }

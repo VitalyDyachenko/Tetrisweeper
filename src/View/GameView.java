@@ -237,7 +237,7 @@ public class GameView {
         game_info_panel.add(lvl_label);
         game_info_panel.add(Box.createVerticalStrut(20));
         game_info_panel.add(srs_label);
-        game_info_panel.add(Box.createVerticalStrut(150));
+        game_info_panel.add(Box.createVerticalStrut(160));
         //                                <- Место под volume_label
         game_info_panel.add(Box.createVerticalStrut(20));
         game_info_panel.add(restart_button);
@@ -426,6 +426,19 @@ public class GameView {
         record_panel_title.setOpaque(true);
         record_panel_title.setMaximumSize(new Dimension(420, 40));
 
+        // Помощь
+        JButton help = new JButton("HELP");
+        help.setFont(new Font("Arial", Font.BOLD, 20));
+        help.setAlignmentX(Component.CENTER_ALIGNMENT);
+        help.addActionListener(e -> {
+            if (input_handler != null) input_handler.onHelp();
+        });
+        help.setFocusable(false);
+        help.setMargin(new Insets(5, 30, 5, 30));
+        help.setBackground(new Color(96, 96, 96));
+        help.setForeground(MENU_TEXT_COLOR);
+        help.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         // Кнопка старта
         JButton start_button = new JButton("START");
         start_button.setFont(new Font("Arial", Font.BOLD, 24));
@@ -435,9 +448,19 @@ public class GameView {
         });
         start_button.setFocusable(false);
         start_button.setMargin(new Insets(5, 30, 5, 30));
-        start_button.setBackground(new Color(96, 96, 96));
-        start_button.setForeground(MENU_TEXT_COLOR);
+        start_button.setBackground(MENU_TEXT_COLOR);
+        start_button.setForeground(MENU_COLOR);
         start_button.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Панель с кнопкой старта и помощи
+        JPanel down_panel = new JPanel();
+        down_panel.setBackground(MENU_COLOR);
+        down_panel.setLayout(new BoxLayout(down_panel, BoxLayout.X_AXIS));
+        down_panel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        down_panel.add(help);
+        down_panel.add(Box.createHorizontalStrut(20));
+        down_panel.add(start_button);
+        down_panel.setMaximumSize(new Dimension(300, 40));
 
         // Панель главного меню
         menu_panel = new JPanel();
@@ -451,12 +474,14 @@ public class GameView {
         menu_panel.add(Box.createVerticalStrut(20));
         menu_panel.add(record_panel_title);
         menu_panel.add(record_panel);
-        menu_panel.add(Box.createVerticalStrut(20));
+        menu_panel.add(Box.createVerticalStrut(10));
         menu_panel.add(srs_checkbox);
-        menu_panel.add(Box.createVerticalStrut(20));
+        menu_panel.add(Box.createVerticalStrut(10));
         menu_panel.add(volume_panel); // Место под volume_panel
         menu_panel.add(Box.createVerticalStrut(20));
-        menu_panel.add(start_button);
+        //menu_panel.add(help);
+        menu_panel.add(Box.createVerticalStrut(30));
+        menu_panel.add(down_panel);
 
         main_panel.add(menu_panel, BorderLayout.CENTER);
     }
@@ -593,16 +618,6 @@ public class GameView {
         stop_panel.setVisible(context.state == GameState.LOSE || context.state == GameState.PAUSE);
         save_score_button.setVisible(context.state == GameState.LOSE);
     }
-    public void updateScores(List<Map.Entry<String, Integer>> scores) {
-        StringBuilder sb = new StringBuilder();
-        int place = 1;
-        for (Map.Entry<String, Integer> entry : scores) {
-            sb.append(String.format("%3d. %-24s %7d\n",
-                    place++, entry.getKey(), entry.getValue()));
-        }
-
-        record_list.setText(sb.toString());
-    }
 
     public void addRecordWindow() {
         JFrame record_window = new JFrame("Save score");
@@ -638,5 +653,129 @@ public class GameView {
         record_window.setLocation(521, 440);
         record_window.setVisible(true);
         record_window.add(panel);
+    }
+    public void updateScores(List<Map.Entry<String, Integer>> scores) {
+        StringBuilder sb = new StringBuilder();
+        int place = 1;
+        for (Map.Entry<String, Integer> entry : scores) {
+            sb.append(String.format("%3d. %-24s %7d\n", place++, entry.getKey(), entry.getValue()));
+        }
+
+        record_list.setText(sb.toString());
+    }
+
+    public void addHelpWindow() {
+        JFrame help_window = new JFrame("Help");
+        help_window.setIconImage(new ImageIcon("resources/UI/help.png").getImage());
+        help_window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        help_window.setSize(500, 400);
+        help_window.setLocation(1000, 240);
+
+        JTextArea help_text = new JTextArea();
+        help_text.setEditable(false);
+        help_text.setFont(new Font("Consolas", Font.BOLD, 18));
+        help_text.setFocusable(false);
+        help_text.setBackground(new Color(80, 80, 80));
+        help_text.setForeground(MENU_TEXT_COLOR);
+
+        JScrollPane help_panel = new JScrollPane(help_text);
+        help_panel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        help_panel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        help_panel.setBorder(null);
+        JScrollBar scrollbar = help_panel.getVerticalScrollBar();
+        scrollbar.setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
+            @Override
+            protected void configureScrollBarColors() {
+                this.thumbColor = new Color(51, 51, 51);
+                this.thumbDarkShadowColor = new Color(122, 122, 122);
+                this.thumbHighlightColor = new Color(122, 122, 122);
+                this.trackColor = new Color(40, 40, 40);
+            }
+            @Override
+            protected JButton createDecreaseButton(int orientation) {
+                return createZeroButton();
+            }
+            @Override
+            protected JButton createIncreaseButton(int orientation) {
+                return createZeroButton();
+            }
+            private JButton createZeroButton() {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(0, 0));
+                button.setMinimumSize(new Dimension(0, 0));
+                button.setMaximumSize(new Dimension(0, 0));
+                return button;
+            }
+        });
+        setHelpText(help_text);
+        SwingUtilities.invokeLater(() -> scrollbar.setValue(0));
+
+
+        help_window.add(help_panel);
+        help_window.setVisible(true);
+    }
+    private void setHelpText(JTextArea help_text) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\tControls:\n");
+        sb.append("[D|→]\t Move tetrimino right\n");
+        sb.append("[A|←]\t Move tetrimino left\n");
+        sb.append("[S|↓]\t Move tetrimino down\n");
+        sb.append("\n");
+        sb.append("[W|E|↑]\t Rotate tetrimino right\n");
+        sb.append("[Q]\t Rotate tetrimino left\n");
+        sb.append("\n");
+        sb.append("[SPACE]\t Hard drop\n");
+        sb.append("\n");
+        sb.append("[C]\t Hold\n");
+        sb.append("\n\n");
+        sb.append("[RMB]\t Set flag\n");
+        sb.append("[LMB]\t Open cell\n");
+        sb.append("\n\n");
+        sb.append("\tGame Description:\n");
+        String text = """
+                Tetrisweeper - смесь тетриса и сапёра.
+                Изначально всё выглядит, как тетрис. Здесь
+                точно также нужно управлять падающими
+                фигурами и пытаться запонить ими линии.
+                Но после запонения линии она не удаляется.
+                
+                Для этого клктки нужно открывать точно так
+                же, как в классическом сапёре:
+                В каждой клетке может оказаться мина, если
+                открыть клетку с ней - это поражение.
+                Но если открыть клетку без мины, то в ней
+                отобразится число - количество мин вокруг
+                неё (0-8). Таким образом можно вычислять
+                мины. На предполагаемое место мины можно
+                поставить флажок.
+                
+                Если все клетки в линии, которые имеют мины,
+                будут помечены флажками, а все клетки без мин
+                открыты, линия удалится.
+                
+                Но есть ключевые правила, которые я решил
+                добавить, чтобы игра была интеремнее.
+                Первое - клетки у границ блокируются, их
+                открывать нельзя (визуально отображаются с
+                крестом). Это сделано для того, чтобы
+                нельзя было просто вычислить мину, когда
+                фигура только приземлилась у открытой клетки.
+                
+                Второе правило, которое пришлось сделать -
+                это исключение из первого. Ведь если накрыть
+                пустое пространство клетками, то его больше
+                никак не заполнить, ведь клетки над этой
+                "дыркой" заблокированы, а значит их
+                невозможно открыть и удалить. Я назвал это
+                "Hole problem". И второе правило эту
+                проблему решает: все клетки над такими
+                дырками можно открывать.
+                
+                Чем больше линий будет очищено, тем больше
+                очков. Удачи!
+                """;
+        sb.append(text);
+
+        help_text.setText(sb.toString());
     }
 }
