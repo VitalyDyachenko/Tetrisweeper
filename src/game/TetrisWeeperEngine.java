@@ -27,18 +27,18 @@ public class TetrisWeeperEngine {
             @Override
             public void onLeft() {
                 if (context.state == GameState.RUN) {
-                    context.tet.moveLeft(context.field);
+                    if (context.tet.moveLeft(context.field))
+                        music_player.playSound(MusicType.MOVE);
                     view.update(context);
                 }
-                music_player.playSound(MusicType.MOVE);
             }
             @Override
             public void onRight() {
                 if (context.state == GameState.RUN) {
-                    context.tet.moveRight(context.field);
+                    if (context.tet.moveRight(context.field))
+                        music_player.playSound(MusicType.MOVE);
                     view.update(context);
                 }
-                music_player.playSound(MusicType.MOVE);
             }
             @Override
             public void onDown() {
@@ -51,18 +51,18 @@ public class TetrisWeeperEngine {
             @Override
             public void onRotateLeft() {
                 if (context.state == GameState.RUN) {
-                    context.tet.rotateLeft(context);
+                    if (context.tet.rotateLeft(context))
+                        music_player.playSound(MusicType.ROTATE);
                     view.update(context);
                 }
-                music_player.playSound(MusicType.ROTATE);
             }
             @Override
             public void onRotateRight() {
                 if (context.state == GameState.RUN) {
-                    context.tet.rotateRight(context);
+                    if (context.tet.rotateRight(context))
+                        music_player.playSound(MusicType.ROTATE);
                     view.update(context);
                 }
-                music_player.playSound(MusicType.ROTATE);
             }
             @Override
             public void onHardDrop() {
@@ -241,7 +241,6 @@ public class TetrisWeeperEngine {
         if (res.landed) {
             nextTetrimino();
             music_player.playSound(MusicType.DROP);
-            //System.out.println(res.was_lines_cleared);
             if (res.was_lines_cleared) {
                 music_player.playSound(MusicType.LINE);
             }

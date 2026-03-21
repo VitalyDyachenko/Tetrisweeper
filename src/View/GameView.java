@@ -21,6 +21,7 @@ import static View.music.MusicPlayer.DEFAULT_VOLUME;
 public class GameView {
     private static final Color MENU_COLOR = new Color(49, 49, 49);
     private static final Color MENU_TEXT_COLOR = new Color(210, 210, 210);
+    private static final int GAME_INFO_PANEL_X = 168;
 
     private JFrame game_frame; // Окно
     private JPanel main_panel; // Главная панель
@@ -33,6 +34,7 @@ public class GameView {
     private JLabel mode_label; // Текст о режиме игры
     private JLabel score_label;
     private JLabel srs_label;
+    private JLabel lvl_label;
     private JLabel next_tetrimino; // Картинка следющей фигуры
     private JLabel hold_tetrimino; // Картинка удержанной фигуры
     private JButton save_score_button;
@@ -67,7 +69,6 @@ public class GameView {
 
         game_frame.setVisible(true);
     }
-
     private void createGamePanel() {
         game_panel = new JLayeredPane();
 
@@ -139,19 +140,30 @@ public class GameView {
     }
     private void createGameInfoPanel() {
         // Текст о режиме игры
-        mode_label = new JLabel("TETRISWEEPER");
+        mode_label = new JLabel("TETRISWEEPER", SwingConstants.CENTER);
         mode_label.setFont(new Font("Arial", Font.BOLD, 18));
         mode_label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mode_label.setBackground(MENU_COLOR);
+        mode_label.setOpaque(true);
+        mode_label.setForeground(MENU_TEXT_COLOR);
+        mode_label.setMaximumSize(new Dimension(GAME_INFO_PANEL_X, 30));
 
         // Счёт
         score_label = new JLabel("SCORE:");
         score_label.setFont(new Font("Arial", Font.BOLD, 18));
         score_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // Уровень
+        lvl_label = new JLabel("Leevl:");
+        lvl_label.setFont(new Font("Arial", Font.BOLD, 18));
+        lvl_label.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         // SRS
         srs_label = new JLabel("SRS:");
         srs_label.setFont(new Font("Arial", Font.BOLD, 18));
         srs_label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        srs_label.setForeground(new Color(123, 123, 123));
+
 
         // Панель со следующей фигурой
         JLabel next_label = new JLabel(" NEXT:");
@@ -212,7 +224,7 @@ public class GameView {
         // Вся боковая панель
         game_info_panel = new JPanel();
         game_info_panel.setBackground(new Color(192, 192, 192));
-        game_info_panel.setPreferredSize(new Dimension(168, Field.FIELD_Y * FieldDrawer.SIZE));
+        game_info_panel.setPreferredSize(new Dimension(GAME_INFO_PANEL_X, Field.FIELD_Y * FieldDrawer.SIZE));
         game_info_panel.setLayout(new BoxLayout(game_info_panel, BoxLayout.Y_AXIS));
 
         game_info_panel.add(mode_label);
@@ -221,12 +233,14 @@ public class GameView {
         game_info_panel.add(Box.createVerticalStrut(15));
         game_info_panel.add(hold_panel);
         game_info_panel.add(Box.createVerticalStrut(15));
-        game_info_panel.add(srs_label);
-        game_info_panel.add(Box.createVerticalStrut(10));
         game_info_panel.add(score_label);
         game_info_panel.add(Box.createVerticalStrut(10));
+        game_info_panel.add(lvl_label);
+        game_info_panel.add(Box.createVerticalStrut(20));
+        game_info_panel.add(srs_label);
+        game_info_panel.add(Box.createVerticalStrut(150));
         //                                <- Место под volume_label
-        game_info_panel.add(Box.createVerticalStrut(160));
+        game_info_panel.add(Box.createVerticalStrut(20));
         game_info_panel.add(restart_button);
         game_info_panel.add(Box.createVerticalStrut(10));
         game_info_panel.add(menu_button);
@@ -351,14 +365,14 @@ public class GameView {
                 g2.fillRect(trackRect.x, trackRect.y + trackRect.height/2 - 2, trackRect.width, 4);
 
                 int fillWidth = (int)(trackRect.width * (volume_slider.getValue() / 100.0));
-                g2.setColor(new Color(192, 192, 192));
+                g2.setColor(MENU_TEXT_COLOR);
                 g2.fillRect(trackRect.x, trackRect.y + trackRect.height/2 - 2, fillWidth, 4);
             }
 
             @Override
             public void paintThumb(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(new Color(192, 192, 192));
+                g2.setColor(MENU_TEXT_COLOR);
                 g2.fillRect(thumbRect.x, thumbRect.y, thumbRect.width, thumbRect.height);
             }
         });
@@ -440,10 +454,9 @@ public class GameView {
         menu_panel.add(record_panel);
         menu_panel.add(Box.createVerticalStrut(20));
         menu_panel.add(srs_checkbox);
-        menu_panel.add(Box.createVerticalStrut(20));
-        menu_panel.add(volume_panel);
-        //menu_panel.add(volume_slider);
         menu_panel.add(Box.createVerticalStrut(100));
+        menu_panel.add(volume_panel); // Место под volume_panel
+        menu_panel.add(Box.createVerticalStrut(20));
         menu_panel.add(start_button);
 
         main_panel.add(menu_panel, BorderLayout.CENTER);
@@ -545,6 +558,7 @@ public class GameView {
         mode_label.setText(context.mode.toString());
         score_label.setText("SCORE: " + context.score);
         srs_label.setText("SRS: " + (context.super_rotation_system ? "ON" : "OFF"));
+        lvl_label.setText("Level: " + context.level);
 
         setVolumeLabel(context);
 
@@ -560,7 +574,7 @@ public class GameView {
         else {
             if (volume_panel.getParent() != game_info_panel) {
                 menu_panel.remove(volume_panel);
-                game_info_panel.add(volume_panel, 10);
+                game_info_panel.add(volume_panel, 12);
             }
         }
     }
