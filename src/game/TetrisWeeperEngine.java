@@ -22,6 +22,8 @@ public class TetrisWeeperEngine {
     private BestScoreTable tetrisweeper_best = new BestScoreTable("src/game/best_score/tetrisweeper_best.properties");
     private MusicPlayer music_player = new MusicPlayer();
 
+    private int lvl_goal = 5; // Сколько надо очистить линий до следующего lvl
+
     public TetrisWeeperEngine() {
         view.setInputHandler(new InputHandler() {
             @Override
@@ -128,7 +130,10 @@ public class TetrisWeeperEngine {
             public void onStart() {
                 if (context.state != GameState.RUN) {
                     context.field.clear();
+                    lvl_goal = 5;
                     context.score = 0;
+                    context.lines_cleared = 0;
+                    context.level = 1;
                     context.hold_tet = null;
                     context.was_hold = false;
                     nextTetrimino();
@@ -143,6 +148,9 @@ public class TetrisWeeperEngine {
             public void onRestart() {
                 context.field.clear();
                 context.score = 0;
+                lvl_goal = 5;
+                context.lines_cleared = 0;
+                context.level = 1;
                 context.hold_tet = null;
                 context.was_hold = false;
                 nextTetrimino();
@@ -218,6 +226,7 @@ public class TetrisWeeperEngine {
                 music_player.playSound(MusicType.LOSE);
                 music_player.stopMusic();
             }
+            updateLVL();
         });
 
         updateScores();
@@ -234,6 +243,38 @@ public class TetrisWeeperEngine {
             view.updateScores(tetris_best.getScores());
         else if (context.mode == GameMode.TETRISWEEPER)
             view.updateScores(tetrisweeper_best.getScores());
+    }
+
+    private void updateLVL() {
+        if (context.level < 15) {
+            if (context.lines_cleared >= lvl_goal) {
+                lvl_goal += context.level * 5;
+                context.level++;
+                game_timer.setDelay(speed());
+            }
+        }
+    }
+    private int speed() {
+        int speed = switch (context.level) {
+            case 1 -> 1000;
+            case 2 -> 793;
+            case 3 -> 618;
+            case 4 -> 473;
+            case 5 -> 355;
+            case 6 -> 262;
+            case 7 -> 19;
+            case 8 -> 135;
+            case 9 -> 94;
+            case 10 -> 64;
+            case 11 -> 43;
+            case 12 -> 28;
+            case 13 -> 18;
+            case 14 -> 11;
+            case 15 -> 7;
+            default -> 10000;
+        };
+        if (context.mode == GameMode.TETRISWEEPER) speed *= 2;
+        return speed;
     }
 
     private void moveTetrimino(MoveCause cause) {

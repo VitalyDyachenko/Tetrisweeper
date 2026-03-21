@@ -54,6 +54,7 @@ public class Field {
             resolved_lines[y] = is_line;
             if (is_line) shift++;
         }
+        context.lines_cleared += shift;
         if (context.mode == GameMode.TETRIS) {
             if (shift == 1) context.score += 100;
             else if (shift == 2) context.score += 300;

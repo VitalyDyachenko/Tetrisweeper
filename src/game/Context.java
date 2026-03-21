@@ -10,6 +10,7 @@ public class Context {
     public int score = 0;
     public boolean super_rotation_system = true;
     public int level = 1;
+    public int lines_cleared = 0;
 
     public Field field = new Field();
     public FallingTetrimino tet;
