@@ -1,6 +1,7 @@
+![Title](resources/UI/Title.png)
 # Tetrisweeper
 
-![Test](resources/UI/Title.png)
+![Test](demonstrations/HoleProblemDemonstration.mp4)
 
   Tetrisweeper - смесь тетриса и сапёра (Tetris + Mineswipper). Изначально всё выглядит, как тетрис. Здесь точно также нужно управлять падающими фигурами и пытаться запонить ими линии. Но после запонения линии она не удаляется.
   
