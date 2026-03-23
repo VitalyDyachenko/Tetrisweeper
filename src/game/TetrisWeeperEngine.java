@@ -138,17 +138,19 @@ public class TetrisWeeperEngine {
             @Override
             public void onCellLeftClick(int x, int y) {
                 if (context.state == GameState.RUN && context.mode == GameMode.TETRISWEEPER) {
-                    if (context.field.canOpen(x, y)) music_player.playSound(MusicType.CLICK);
-                    Field.OpenResult res = context.field.openByPlayer(context, x, y);
-                    if (res.mine_opened) {
+                    if (context.field.canOpen(x, y)) {
+                        music_player.playSound(MusicType.CLICK);
+                        Field.OpenResult res = context.field.openByPlayer(context, x, y);
+                        if (res.mine_opened) {
+                            view.update(context);
+                            context.state = GameState.LOSE;
+                            music_player.playSound(MusicType.BOMB);
+                        }
+                        else if (res.was_lines_cleared) {
+                            music_player.playSound(MusicType.LINE);
+                        }
                         view.update(context);
-                        context.state = GameState.LOSE;
-                        music_player.playSound(MusicType.BOMB);
                     }
-                    else if (res.was_lines_cleared) {
-                        music_player.playSound(MusicType.LINE);
-                    }
-                    view.update(context);
                 }
             }
             @Override

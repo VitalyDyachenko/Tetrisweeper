@@ -2,7 +2,6 @@ package game;
 
 import Model.minesweeper.Field;
 import Model.tetris.FallingTetrimino;
-import View.music.MusicPlayer;
 
 public class Context {
     public GameMode mode = GameMode.TETRIS;
