@@ -167,7 +167,7 @@ public class TetrisWeeperEngine {
 
             @Override
             public void onStart() {
-                if (context.state != GameState.RUN) {
+                if (context.state != GameState.RUN && context.state != GameState.PAUSE) {
                     startGame();
                 }
             }

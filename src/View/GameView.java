@@ -12,7 +12,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.util.*;
 import java.util.List;
 
@@ -22,6 +21,7 @@ public class GameView {
     private static final Color MENU_COLOR = new Color(49, 49, 49);
     private static final Color MENU_TEXT_COLOR = new Color(210, 210, 210);
     private static final int GAME_INFO_PANEL_X = 168;
+    private static final String GAME_VERSION = "1.0";
 
     private JFrame game_frame; // Окно
     private JPanel main_panel; // Главная панель
@@ -253,6 +253,14 @@ public class GameView {
         //title.setFont(new Font("Arial", Font.BOLD, 32));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        JLabel version_label = new JLabel("v" + GAME_VERSION, SwingConstants.CENTER);
+        version_label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        version_label.setForeground(MENU_TEXT_COLOR);
+        version_label.setFont(new Font("Arial", Font.BOLD, 18));
+        version_label.setBackground(MENU_COLOR);
+        //version_label.setOpaque(true);
+        //version_label.setMaximumSize(new Dimension(420, 40));
+
         Icon normal_icon = new ImageIcon("resources/UI/RadioButton icon 1.png");
         Icon selected_icon = new ImageIcon("resources/UI/RadioButton icon 2.png");
 
@@ -263,7 +271,7 @@ public class GameView {
         tetris_mode_panel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JRadioButton tetris_mode = new JRadioButton("Tetris");
-        tetris_mode.setSelected(true);
+        tetris_mode.setSelected(false);
         tetris_mode.setAlignmentX(Component.CENTER_ALIGNMENT);
         tetris_mode_panel.add(tetris_mode, BorderLayout.CENTER);
         tetris_mode.addActionListener(e -> {
@@ -283,6 +291,7 @@ public class GameView {
         tetrisweeper_mode_panel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JRadioButton tetrisweeper_mode = new JRadioButton("Tetrisweeper");
+        tetrisweeper_mode.setSelected(true);
         tetrisweeper_mode.setAlignmentX(Component.CENTER_ALIGNMENT);
         tetrisweeper_mode_panel.add(tetrisweeper_mode, BorderLayout.CENTER);
         tetrisweeper_mode.addActionListener(e -> {
@@ -469,9 +478,11 @@ public class GameView {
 
         menu_panel.add(Box.createVerticalStrut(10));
         menu_panel.add(title);
-        menu_panel.add(Box.createVerticalStrut(20));
+        menu_panel.add(Box.createVerticalStrut(5));
+        menu_panel.add(version_label);
+        menu_panel.add(Box.createVerticalStrut(10));
         menu_panel.add(mode_panel);
-        menu_panel.add(Box.createVerticalStrut(20));
+        menu_panel.add(Box.createVerticalStrut(15));
         menu_panel.add(record_panel_title);
         menu_panel.add(record_panel);
         menu_panel.add(Box.createVerticalStrut(10));
@@ -480,7 +491,7 @@ public class GameView {
         menu_panel.add(volume_panel); // Место под volume_panel
         menu_panel.add(Box.createVerticalStrut(20));
         //menu_panel.add(help);
-        menu_panel.add(Box.createVerticalStrut(30));
+        menu_panel.add(Box.createVerticalStrut(20));
         menu_panel.add(down_panel);
 
         main_panel.add(menu_panel, BorderLayout.CENTER);
@@ -668,13 +679,13 @@ public class GameView {
         JFrame help_window = new JFrame("Help");
         help_window.setIconImage(new ImageIcon("resources/UI/help.png").getImage());
         help_window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        help_window.setSize(500, 400);
-        help_window.setLocation(1000, 240);
+        help_window.setSize(600, 400);
+        help_window.setLocation(900, 240);
 
         JTextArea help_text = new JTextArea();
         help_text.setEditable(false);
         help_text.setFont(new Font("Consolas", Font.BOLD, 18));
-        help_text.setFocusable(false);
+        //help_text.setFocusable(false);
         help_text.setBackground(new Color(80, 80, 80));
         help_text.setForeground(MENU_TEXT_COLOR);
 
@@ -730,51 +741,11 @@ public class GameView {
         sb.append("\n\n");
         sb.append("[RMB]\t Set flag\n");
         sb.append("[LMB]\t Open cell\n");
+        sb.append("\n");
+        sb.append("[ESC]\t Pause\n");
         sb.append("\n\n");
-        sb.append("\tGame Description:\n");
-        String text = """
-                Tetrisweeper - смесь тетриса и сапёра.
-                Изначально всё выглядит, как тетрис. Здесь
-                точно также нужно управлять падающими
-                фигурами и пытаться запонить ими линии.
-                Но после запонения линии она не удаляется.
-                
-                Для этого клетки нужно открывать точно так
-                же, как в классическом сапёре:
-                В каждой клетке может оказаться мина, если
-                открыть клетку с ней - это поражение.
-                Но если открыть клетку без мины, то в ней
-                отобразится число - количество мин вокруг
-                неё (0-8). Таким образом можно вычислять
-                мины. На предполагаемое место мины можно
-                поставить флажок.
-                
-                Если все клетки в линии, которые имеют мины,
-                будут помечены флажками, а все клетки без мин
-                открыты, линия удалится.
-                
-                Но есть ключевые правила, которые я решил
-                добавить, чтобы игра была интереснее.
-                Первое: клетки у границ блокируются, их
-                открывать нельзя (визуально отображаются с
-                крестом). Это сделано для того, чтобы
-                нельзя было просто вычислить мину, когда
-                фигура только приземлилась у открытой клетки.
-                
-                Второе правило, которое пришлось сделать -
-                это исключение из первого. Ведь если накрыть
-                пустое пространство клетками сверху, то его
-                больше никак не заполнить, ведь клетки над
-                этой "дыркой" заблокированы, а значит их
-                невозможно открыть и удалить. Я назвал это
-                "Hole problem". И второе правило эту
-                проблему решает: все клетки над такими
-                дырками можно открывать.
-                
-                Чем больше линий будет очищено, тем больше
-                очков. Удачи!
-                """;
-        sb.append(text);
+        sb.append("\tSee more:\n");
+        sb.append("https://github.com/VitalyDyachenko/Tetrisweeper");
 
         help_text.setText(sb.toString());
     }

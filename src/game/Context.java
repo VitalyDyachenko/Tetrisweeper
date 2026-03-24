@@ -4,7 +4,7 @@ import Model.minesweeper.Field;
 import Model.tetris.FallingTetrimino;
 
 public class Context {
-    public GameMode mode = GameMode.TETRIS;
+    public GameMode mode = GameMode.TETRISWEEPER;
     public GameState state = GameState.MENU;
     public int score = 0;
     public boolean super_rotation_system = true;
