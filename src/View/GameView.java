@@ -248,7 +248,7 @@ public class GameView {
     }
     private void createMenuPanel() {
         // Заголовок
-        JLabel title = new JLabel(new ImageIcon("resources/UI/Title.png"));
+        JLabel title = new JLabel(new ImageIcon(getClass().getResource("/resources/UI/Title.png")));
         //title.setForeground(Color.WHITE);
         //title.setFont(new Font("Arial", Font.BOLD, 32));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -261,8 +261,8 @@ public class GameView {
         //version_label.setOpaque(true);
         //version_label.setMaximumSize(new Dimension(420, 40));
 
-        Icon normal_icon = new ImageIcon("resources/UI/RadioButton icon 1.png");
-        Icon selected_icon = new ImageIcon("resources/UI/RadioButton icon 2.png");
+        Icon normal_icon = new ImageIcon(getClass().getResource("/resources/UI/RadioButton icon 1.png"));
+        Icon selected_icon = new ImageIcon(getClass().getResource("/resources/UI/RadioButton icon 2.png"));
 
         // Кнопка режима Тетрис:
         JPanel tetris_mode_panel = new JPanel(new BorderLayout());
@@ -335,10 +335,10 @@ public class GameView {
         srs_checkbox.setFont(new Font("Arial", Font.BOLD, 20));
 
         // Переключатель громкости
-        Icon volume_icon0 = new ImageIcon("resources/UI/Volume0.png");
-        Icon volume_icon1 = new ImageIcon("resources/UI/Volume1.png");
-        Icon volume_icon2 = new ImageIcon("resources/UI/Volume2.png");
-        Icon volume_icon3 = new ImageIcon("resources/UI/Volume3.png");
+        Icon volume_icon0 = new ImageIcon(getClass().getResource("/resources/UI/Volume0.png"));
+        Icon volume_icon1 = new ImageIcon(getClass().getResource("/resources/UI/Volume1.png"));
+        Icon volume_icon2 = new ImageIcon(getClass().getResource("/resources/UI/Volume2.png"));
+        Icon volume_icon3 = new ImageIcon(getClass().getResource("/resources/UI/Volume3.png"));
         volume_panel = new JLabel(volume_icon2);
         volume_panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         volume_panel.setAlignmentX(Component.CENTER_ALIGNMENT);

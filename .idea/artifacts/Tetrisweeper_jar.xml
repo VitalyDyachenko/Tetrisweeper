@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Tetrisweeper:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Tetrisweeper_jar</output-path>
+    <root id="archive" name="Tetrisweeper.jar">
+      <element id="module-output" name="Tetrisweeper" />
+      <element id="dir-copy" path="$PROJECT_DIR$/resources" />
+      <element id="dir-copy" path="$PROJECT_DIR$/src/game/best_score" />
+    </root>
+  </artifact>
+</component>

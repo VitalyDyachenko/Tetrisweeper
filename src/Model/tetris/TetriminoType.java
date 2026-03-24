@@ -14,7 +14,7 @@ public enum TetriminoType {
     private final ImageIcon icon;
 
     TetriminoType() {
-        this.icon = new ImageIcon("resources/game/" + this.toString() + " show.png");
+        this.icon = new ImageIcon(getClass().getResource("/resources/game/" + this.toString() + " show.png"));
     }
 
     public ImageIcon getIcon() {

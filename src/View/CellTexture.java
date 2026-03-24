@@ -40,7 +40,7 @@ public enum CellTexture {
     private final ImageIcon icon;
 
     CellTexture(String fileName) {
-        this.icon = new ImageIcon("resources/game/" + fileName + ".png");
+        this.icon = new ImageIcon(getClass().getResource("/resources/game/" + fileName + ".png"));
     }
 
     public ImageIcon getIcon() {

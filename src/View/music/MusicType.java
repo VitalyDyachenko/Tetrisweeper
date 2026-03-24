@@ -16,10 +16,10 @@ public enum MusicType {
     MENU("Menu"),
     GAME("Game");
 
-    private final File file;
-    public File getFile() {return file;}
+    private final String file;
+    public String getFilePath() {return file;}
 
     MusicType(String filename) {
-        this.file = new File("resources/sounds/" + filename + ".wav");
+        this.file = "/resources/sounds/" + filename + ".wav";
     }
 }

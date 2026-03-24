@@ -20,8 +20,8 @@ public class TetrisWeeperEngine {
         gameLoop();
     });;
     private static final Random RANDOM = new Random();
-    private BestScoreTable tetris_best = new BestScoreTable("src/game/best_score/tetris_best.properties");
-    private BestScoreTable tetrisweeper_best = new BestScoreTable("src/game/best_score/tetrisweeper_best.properties");
+    private BestScoreTable tetris_best = new BestScoreTable("tetris_best.properties");
+    private BestScoreTable tetrisweeper_best = new BestScoreTable("tetrisweeper_best.properties");
     private MusicPlayer music_player = new MusicPlayer();
 
     private int lvl_goal = 5; // Сколько надо очистить линий до следующего lvl

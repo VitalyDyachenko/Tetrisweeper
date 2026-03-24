@@ -1,7 +1,9 @@
 package View.music;
 
 import javax.sound.sampled.*;
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +20,13 @@ public class MusicPlayer {
         }
 
         try {
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(type.getFile());
+            InputStream is = getClass().getResourceAsStream(type.getFilePath());
+            if (is == null) {
+                return null;
+            }
+            BufferedInputStream bis = new BufferedInputStream(is);
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(bis);
+
             Clip clip = AudioSystem.getClip();
             clip.open(audioStream);
             sounds.put(type, clip);

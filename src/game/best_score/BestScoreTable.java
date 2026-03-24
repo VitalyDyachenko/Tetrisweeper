@@ -1,17 +1,28 @@
 package game.best_score;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class BestScoreTable {
     private Properties scores = new Properties();
+    private String jarPath = BestScoreTable.class.getProtectionDomain()
+            .getCodeSource()
+            .getLocation()
+            .getPath();
+    private File jarFile;
+    private File jarFolder;
+
+    private File records_folder = new File(jarFolder, "records");
     private File file;
 
-    public BestScoreTable(String path) {
-        file = new File(path);
+    public BestScoreTable(String name) {
+        jarPath = URLDecoder.decode(jarPath, StandardCharsets.UTF_8);
+        jarFile = new File(jarPath);
+        jarFolder = jarFile.getParentFile();
+        records_folder.mkdirs();
+        file = new File(records_folder, name);
         load();
     }
 
